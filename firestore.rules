@@ -1,0 +1,102 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper Functions ─────────────────────────────────────────────────
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function hasRole(role) {
+      return isAuthenticated() && getUserData().role == role;
+    }
+
+    function isAdmin() {
+      return hasRole('admin');
+    }
+
+    function isCoach() {
+      return hasRole('coach');
+    }
+
+    function isAdminOrCoach() {
+      return isAuthenticated() && getUserData().role in ['admin', 'coach'];
+    }
+
+    function sameSchool(schoolId) {
+      return isAuthenticated() && getUserData().schoolId == schoolId;
+    }
+
+    // ── Users Collection ─────────────────────────────────────────────────
+    match /users/{userId} {
+      // Users can read/write their own profile
+      // Admins and coaches can read players in same school
+      allow read: if isOwner(userId)
+                  || isAdminOrCoach();
+      allow create: if isAuthenticated()
+                    && request.auth.uid == userId;
+      allow update: if isOwner(userId)
+                    || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── Schools Collection ───────────────────────────────────────────────
+    match /schools/{schoolId} {
+      allow read: if isAuthenticated() && sameSchool(schoolId);
+      allow write: if isAdmin() && sameSchool(schoolId);
+    }
+
+    // ── Teams Collection ─────────────────────────────────────────────────
+    match /teams/{teamId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdminOrCoach();
+      allow update, delete: if isAdminOrCoach();
+    }
+
+    // ── Attendance Collection ────────────────────────────────────────────
+    match /attendance/{recordId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAdminOrCoach();
+      allow delete: if isAdmin();
+    }
+
+    // ── Performance Collection ───────────────────────────────────────────
+    match /performance/{recordId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAdminOrCoach();
+      allow delete: if isAdmin();
+    }
+
+    // ── Injuries Collection (NEW) ────────────────────────────────────────
+    match /injuries/{injuryId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdminOrCoach();
+      allow update: if isAdminOrCoach();
+      allow delete: if isAdmin();
+    }
+
+    // ── Fitness Tests Collection (NEW) ───────────────────────────────────
+    match /fitness_tests/{testId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdminOrCoach();
+      allow update: if isAdminOrCoach();
+      allow delete: if isAdmin();
+    }
+
+    // ── Match Results Collection (NEW) ───────────────────────────────────
+    match /match_results/{matchId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAdminOrCoach();
+      allow delete: if isAdmin();
+    }
+  }
+}

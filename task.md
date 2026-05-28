@@ -1,0 +1,19 @@
+- [x] **1. Replace Logos**
+  - Copy new logos from `c:\Users\prash\OneDrive\Desktop\app\TRACKMYPLAY\logos` to the `public/` directory, updating references if necessary.
+- [x] **2. Fix Admin Dashboard Alignment**
+  - Modify `AdminDashboard.jsx` flex/grid container for Quick Actions.
+- [x] **3. Real-time Notification System**
+  - Create `NotificationContext.jsx` with Firebase `onSnapshot`.
+  - Update `Holidays.jsx` to trigger notifications on holiday creation.
+  - Create `NotificationDropdown.jsx` UI component.
+- [x] **4. Dashboard Core Layout**
+  - Create `DashboardLayout.jsx`, `DashboardSidebar.jsx`, `DashboardHeader.jsx`.
+- [x] **5. Player Profile Dashboard Screen**
+  - Build main dashboard screen with specified widgets.
+  - Setup route `/coach/player-dashboard`.
+- [x] **6. Player Comparison Screen**
+  - Build a split-view player comparison UI based on new mockups.
+  - Setup route `/coach/compare`.
+- [x] **7. Advanced Calendar Screen**
+  - Build a full calendar UI with indicators for match/training/holiday and a daily detail view.
+  - Setup route `/coach/calendar`.
