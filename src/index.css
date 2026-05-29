@@ -370,6 +370,22 @@
   animation: rotateBorder 4s linear infinite;
 }
 
+/* Graph bar grow-up animation with elastic bounce */
+@keyframes growUp {
+  from {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+.animate-grow-up {
+  animation: growUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transform-origin: bottom;
+}
+
 /* ===== BASE STYLES ===== */
 html {
   font-family: 'Lexend', sans-serif;

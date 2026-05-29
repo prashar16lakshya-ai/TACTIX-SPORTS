@@ -224,17 +224,20 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="flex-1 min-h-[200px] relative flex flex-col justify-between">
+            <div className="flex-1 min-h-[220px] relative flex flex-col justify-between">
               <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-8">
                 {[1, 2, 3, 4, 5].map(i => <div key={i} className="w-full h-px bg-on-surface/5"></div>)}
               </div>
               {/* Dynamic Chart Area */}
-              <div className="flex-1 flex items-end justify-around px-4 gap-4 pb-8 z-10">
+              <div className="flex-1 min-h-[160px] flex items-stretch justify-around px-4 gap-3 pb-8 z-10">
                 {chartData.map((val, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
+                  <div key={`${trendRange}-${i}`} className="flex-1 flex flex-col justify-end items-center gap-2 group h-full">
                     <div
-                      className="w-full bg-gradient-to-t from-[#FF1493]/20 to-[#FF1493] rounded-t-lg transition-all duration-1000 shadow-[0_0_15px_rgba(0,194,255,0.2)] group-hover:shadow-[0_0_25px_rgba(0,194,255,0.4)]"
-                      style={{ height: `${val}%` }}
+                      className="w-full bg-gradient-to-t from-[#FF1493]/20 to-[#FF1493] rounded-t-lg transition-all duration-500 shadow-[0_0_15px_rgba(255,20,147,0.15)] group-hover:shadow-[0_0_25px_rgba(255,20,147,0.35)] animate-grow-up"
+                      style={{ 
+                        height: `${val}%`,
+                        animationDelay: `${i * 60}ms`
+                      }}
                     ></div>
                     <span className="text-[10px] font-bold text-on-surface/30 uppercase tracking-tighter">{['M', 'T', 'W', 'T', 'F', 'S', 'S'][i]}</span>
                   </div>
