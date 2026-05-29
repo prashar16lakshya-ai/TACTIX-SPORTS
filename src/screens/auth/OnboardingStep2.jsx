@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import InputField from '../../components/onboarding/InputField'
-import Button from '../../components/onboarding/Button'
 import ProgressHeader from '../../components/onboarding/ProgressHeader'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '../../firebase'
@@ -172,23 +171,31 @@ export default function OnboardingStep2({ prevStep, nextStep, completeSignup, on
           )}
 
           <div className="space-y-4">
-            <div className="flex gap-4">
+            <div className="flex items-stretch gap-3 mt-8">
               <button
                 type="button"
                 onClick={prevStep}
-                className="w-12 h-12 flex shrink-0 items-center justify-center rounded-xl border border-outline-variant text-on-surface-variant hover:text-primary hover:bg-on-surface/5 transition-colors"
+                className="w-14 flex shrink-0 items-center justify-center rounded-xl border border-outline-variant text-on-surface-variant hover:text-[#DC143C] hover:border-[#DC143C]/30 hover:bg-[#DC143C]/5 transition-all active:scale-95"
               >
-                <span className="material-symbols-outlined">arrow_back</span>
+                <span className="material-symbols-outlined text-[22px]">arrow_back</span>
               </button>
-              <div className="flex-1">
-                <Button
-                  type="submit"
-                  text="Continue"
-                  icon="arrow_forward"
-                  loading={loading && !data.isGoogleUser}
-                  disabled={!!emailError || !!passwordError || validatingEmail}
-                />
-              </div>
+              <button
+                type="submit"
+                disabled={loading || !!emailError || !!passwordError || validatingEmail}
+                className="flex-1 bg-primary hover:bg-primary-fixed text-on-primary font-bold text-body-md py-4 rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(220,20,60,0.3)] disabled:opacity-60 uppercase tracking-widest"
+              >
+                {(loading && !data.isGoogleUser) ? (
+                  <svg className="animate-spin h-5 w-5 text-on-primary" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z" />
+                  </svg>
+                ) : (
+                  <>
+                    <span>Continue</span>
+                    <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>arrow_forward</span>
+                  </>
+                )}
+              </button>
             </div>
 
             <div className="flex items-center gap-4 my-4">

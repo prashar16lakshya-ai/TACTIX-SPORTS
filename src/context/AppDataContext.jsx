@@ -46,6 +46,25 @@ export function AppDataProvider({ children }) {
   useEffect(() => {
     if (!user?.uid) return
 
+    // In demo mode, provide mock data instead of Firestore queries
+    if (user?.isDemo) {
+      setData(prev => ({
+        ...prev,
+        players: [
+          { id: 'demo-p1', name: 'Arjun Sharma', role: 'player', sport: 'Football', teamId: 'DEMO-TEAM', schoolId: 'DEMO-SCHOOL', initials: 'AS', attendanceStats: { total: 20, attended: 18, percentage: 90 } },
+          { id: 'demo-p2', name: 'Priya Singh', role: 'player', sport: 'Football', teamId: 'DEMO-TEAM', schoolId: 'DEMO-SCHOOL', initials: 'PS', attendanceStats: { total: 20, attended: 16, percentage: 80 } },
+          { id: 'demo-p3', name: 'Rahul Kumar', role: 'player', sport: 'Football', teamId: 'DEMO-TEAM', schoolId: 'DEMO-SCHOOL', initials: 'RK', attendanceStats: { total: 20, attended: 14, percentage: 70 } },
+          { id: 'demo-p4', name: 'Ananya Patel', role: 'player', sport: 'Football', teamId: 'DEMO-TEAM', schoolId: 'DEMO-SCHOOL', initials: 'AP', attendanceStats: { total: 20, attended: 19, percentage: 95 } },
+          { id: 'demo-p5', name: 'Vikram Rao', role: 'player', sport: 'Football', teamId: 'DEMO-TEAM', schoolId: 'DEMO-SCHOOL', initials: 'VR', attendanceStats: { total: 20, attended: 12, percentage: 60 } },
+        ],
+        groups: [
+          { id: 'DEMO-TEAM', name: 'Demo Team', sport: 'Football', schoolId: 'DEMO-SCHOOL', teamId: 'DEMO-TEAM' },
+        ],
+      }))
+      return // Don't set up Firestore listeners in demo mode
+    }
+
+
     // Setup Queries based on Role and School/Team for Isolation
     const role = user?.role?.toLowerCase()
     

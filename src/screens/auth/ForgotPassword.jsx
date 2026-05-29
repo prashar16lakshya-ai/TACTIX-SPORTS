@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { resetPassword } from '../../auth'
+import { useAuth } from '../../context/AuthContext'
 
 export default function ForgotPassword() {
   const navigate = useNavigate()
+  const { resetPassword } = useAuth()
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -14,10 +15,14 @@ export default function ForgotPassword() {
     setError('')
     try {
       setLoading(true)
-      await resetPassword(email)
-      setSent(true)
+      const result = await resetPassword(email)
+      if (result.success) {
+        setSent(true)
+      } else {
+        setError(result.error || 'Failed to send reset email')
+      }
     } catch (error) {
-      setError(error.message)
+      setError(error.message || 'Something went wrong')
     } finally {
       setLoading(false)
     }
@@ -25,14 +30,9 @@ export default function ForgotPassword() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden px-container-padding">
-      <div className="absolute inset-0 z-0">
-        <img
-          alt="background"
-          className="w-full h-full object-cover opacity-30 mix-blend-overlay"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIl25-1MpXwnXRKxKhjt5T3IaIuQc7iEeOfjwSUVV-4_jNoI0BfPSLIIl-8gC4HET2Ll1iscO2m0lFHnXWbkTEZvkARlTTQOueZMk99lWKC6DnaziYLWy6ZrIzGJU7GRf2pb6egBXQ5F6QAq9psbok367XkBz9PKrBUZlQqPPD9zy70tvrv2p3OOf-AQLLO5ays8YOPnc1eKga0a9txLHox2-Dh4rvDtI-qci-vzO4EkPBP-yXEgy8Gh2FMkWXRWKrUo-yf22hFHc-"
-        />
-        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-primary-container/20 rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-[120px]"></div>
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute top-[-15%] left-[-10%] w-[450px] h-[450px] rounded-full animate-float opacity-60" style={{ background: 'radial-gradient(circle, rgba(220,20,60,0.15) 0%, transparent 70%)' }}></div>
+        <div className="absolute bottom-[-15%] right-[-10%] w-[380px] h-[380px] rounded-full animate-float-reverse opacity-50" style={{ background: 'radial-gradient(circle, rgba(255,20,147,0.12) 0%, transparent 70%)' }}></div>
       </div>
 
       <main className="relative z-10 w-full max-w-md">

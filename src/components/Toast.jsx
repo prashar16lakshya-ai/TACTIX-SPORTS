@@ -4,7 +4,7 @@ const ICONS = { success: 'check_circle', error: 'error', info: 'info', warning: 
 
 const STYLES = {
   success: {
-    wrapper: 'border-[#DC143C]/30 bg-[#0F0F0F]/95 backdrop-blur-xl',
+    wrapper: 'border-[#DC143C]/30 bg-surface/95 backdrop-blur-xl',
     icon: 'text-[#DC143C]',
     bar: 'bg-[#DC143C]',
   },
@@ -14,7 +14,7 @@ const STYLES = {
     bar: 'bg-red-500',
   },
   info: {
-    wrapper: 'border-[#FF1493]/30 bg-[#0F0F0F]/95 backdrop-blur-xl',
+    wrapper: 'border-[#FF1493]/30 bg-surface/95 backdrop-blur-xl',
     icon: 'text-[#FF1493]',
     bar: 'bg-[#FF1493]',
   },

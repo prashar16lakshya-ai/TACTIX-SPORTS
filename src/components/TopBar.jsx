@@ -49,7 +49,7 @@ export default function TopBar({ title = 'TACTIX  ', trailingIcon = 'notificatio
   }
 
   return (
-    <header className="bg-[#0A0A0A]/90 backdrop-blur-xl text-on-surface font-['Inter'] font-bold tracking-tight top-0 z-[100] sticky border-b border-white/5 shadow-[0_1px_20px_rgba(0,0,0,0.3)] flex justify-between items-center h-16 px-5 w-full animate-slide-down">
+    <header className="bg-surface/90 backdrop-blur-xl text-on-surface font-['Inter'] font-bold tracking-tight top-0 z-[100] sticky border-b border-outline-variant/15 shadow-[0_1px_20px_rgba(0,0,0,0.15)] flex justify-between items-center h-16 px-5 w-full animate-slide-down">
 
       {/* Red accent line at very top */}
       <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#DC143C] to-transparent opacity-60" />
@@ -121,7 +121,7 @@ export default function TopBar({ title = 'TACTIX  ', trailingIcon = 'notificatio
 
         {/* Dropdown */}
         {dropdownOpen && (
-          <div className="absolute top-12 right-0 mt-2 w-52 bg-[#111111]/95 backdrop-blur-xl border border-white/8 rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.5)] py-2 flex flex-col z-[101] animate-fade-in-scale">
+          <div className="absolute top-12 right-0 mt-2 w-52 bg-surface-container/95 backdrop-blur-xl border border-outline-variant/20 rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.3)] py-2 flex flex-col z-[101] animate-fade-in-scale">
             {/* Top accent */}
             <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-[#DC143C]/40 to-transparent" />
 

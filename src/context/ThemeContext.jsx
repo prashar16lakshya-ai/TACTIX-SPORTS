@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
-const THEME_KEY = 'TACTIX  _theme'
+const THEME_KEY = 'TACTIX_theme'
 const ThemeContext = createContext(null)
 
 export function ThemeProvider({ children }) {

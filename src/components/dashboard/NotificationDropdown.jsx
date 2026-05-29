@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNotification } from '../../context/NotificationContext'
 
 export default function NotificationDropdown() {
@@ -24,12 +24,12 @@ export default function NotificationDropdown() {
       >
         <span className="material-symbols-outlined">notifications</span>
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-[#0A0A0A]"></span>
+          <span className="absolute top-1 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-surface"></span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-[#121212] border border-outline-variant/30 rounded-2xl shadow-2xl z-50 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-80 bg-surface-container/95 backdrop-blur-xl border border-outline-variant/20 rounded-2xl shadow-2xl z-50 overflow-hidden">
           <div className="p-4 border-b border-outline-variant/30 flex justify-between items-center bg-on-surface/5">
             <h3 className="text-on-surface font-bold text-sm">Notifications</h3>
             {unreadCount > 0 && (

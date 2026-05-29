@@ -20,21 +20,30 @@ export default function SplashScreen() {
       })
     }, 40)
 
-    if (loading) return () => { clearInterval(interval); clearTimeout(showTimer) }
+    // Don't navigate until auth state is resolved
+    if (loading) {
+      // Safety timeout: if auth takes too long (5s), go to login
+      const safetyTimer = setTimeout(() => {
+        console.warn('[SplashScreen] Auth loading timeout — redirecting to login')
+        navigate('/login', { replace: true })
+      }, 5000)
+      return () => { clearInterval(interval); clearTimeout(showTimer); clearTimeout(safetyTimer) }
+    }
 
+    // Auth is ready — navigate after a short delay for the animation
     const timer = setTimeout(() => {
       if (user) {
         navigate('/dashboard', { replace: true })
       } else {
         navigate('/login', { replace: true })
       }
-    }, 2600)
+    }, 1200)
 
     return () => { clearTimeout(timer); clearInterval(interval); clearTimeout(showTimer) }
   }, [loading, navigate, user])
 
   return (
-    <div className="min-h-dvh bg-[#0A0A0A] text-on-surface flex flex-col overflow-hidden relative">
+    <div className="min-h-dvh bg-background text-on-surface flex flex-col overflow-hidden relative">
 
       {/* Animated background orbs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">

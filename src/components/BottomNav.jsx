@@ -44,7 +44,7 @@ export default function BottomNav() {
   return (
     <nav
       id="bottom-nav"
-      className="md:hidden fixed bottom-0 left-0 w-full bg-[#0F0F0F]/95 backdrop-blur-xl border-t border-white/8 flex justify-around items-stretch h-16 z-50 animate-slide-up"
+      className="md:hidden fixed bottom-0 left-0 w-full bg-surface/95 backdrop-blur-xl border-t border-outline-variant/20 flex justify-around items-stretch h-16 z-50 animate-slide-up"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       {tabs.map((tab, idx) => {

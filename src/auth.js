@@ -5,14 +5,26 @@ import {
   signOut,
   sendPasswordResetEmail,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult
 } from 'firebase/auth'
 
 const googleProvider = new GoogleAuthProvider()
 
-// GOOGLE LOGIN
-export const googleLogin = () =>
-  signInWithPopup(auth, googleProvider)
+// Detect if running inside Capacitor WebView (APK)
+const isCapacitor = () => !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())
+
+// GOOGLE LOGIN — uses redirect for Capacitor (popups don't work in WebView), popup for web
+export const googleLogin = () => {
+  if (isCapacitor()) {
+    return signInWithRedirect(auth, googleProvider)
+  }
+  return signInWithPopup(auth, googleProvider)
+}
+
+// Check for redirect result (call on app init for Capacitor)
+export const checkGoogleRedirectResult = () => getRedirectResult(auth)
 
 // SIGNUP
 export const signup = (email, password) =>

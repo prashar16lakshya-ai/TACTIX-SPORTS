@@ -74,7 +74,7 @@ export default function DashboardSidebar({ onClose }) {
   }
 
   return (
-    <aside className="w-[280px] h-full bg-[#0A0A0A]/98 backdrop-blur-2xl border-r border-white/5 flex flex-col overflow-hidden animate-slide-in-left">
+    <aside className="w-[280px] h-full bg-surface/98 backdrop-blur-2xl border-r border-outline-variant/15 flex flex-col overflow-hidden animate-slide-in-left">
       {/* Red accent line at top */}
       <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#DC143C] via-[#FF1493] to-[#DC143C] opacity-70" />
 
@@ -103,7 +103,7 @@ export default function DashboardSidebar({ onClose }) {
             }
           </div>
           {/* Online dot */}
-          <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-[#0A0A0A] animate-pop" />
+          <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-surface animate-pop" />
         </div>
         <div className="min-w-0">
           <p className="text-on-surface font-semibold text-sm truncate">{user?.name || 'User'}</p>

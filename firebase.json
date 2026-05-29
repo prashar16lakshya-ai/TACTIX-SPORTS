@@ -16,5 +16,14 @@
         "destination": "/index.html"
       }
     ]
+  },
+  "auth": {
+    "providers": {
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "TACTIX Sports",
+        "supportEmail": "support@tactix.io"
+      }
+    }
   }
 }

@@ -71,7 +71,7 @@ export default function DashboardHeader({ onMenuClick }) {
   const initials = user?.initials || user?.name?.slice(0, 2)?.toUpperCase() || 'U'
 
   return (
-    <header className="h-14 bg-[#0A0A0A] border-b border-white/8 flex items-center px-4 gap-3 sticky top-0 z-40 shrink-0">
+    <header className="h-14 bg-surface/95 backdrop-blur-xl border-b border-outline-variant/15 flex items-center px-4 gap-3 sticky top-0 z-40 shrink-0">
       {/* Hamburger — HIDDEN in demo mode per requirement */}
       {!user?.isDemo ? (
         <button
@@ -129,7 +129,7 @@ export default function DashboardHeader({ onMenuClick }) {
             </button>
 
             {isProfileOpen && (
-              <div className="absolute top-10 right-0 w-52 bg-[#111111] border border-outline-variant/30 rounded-xl shadow-xl py-2 z-50">
+              <div className="absolute top-10 right-0 w-52 bg-surface-container/95 backdrop-blur-xl border border-outline-variant/20 rounded-xl shadow-xl py-2 z-50">
                 <div className="px-4 pb-2 border-b border-white/5 mb-1">
                   <p className="text-on-surface font-bold text-sm truncate">{user?.name || 'User'}</p>
                   <p className="text-on-surface/40 text-[11px] capitalize">{user?.role || 'Member'}</p>

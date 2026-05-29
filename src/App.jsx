@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import { AppDataProvider } from './context/AppDataContext'
 import ProtectedRoute from "./components/ProtectedRoute"
 import { NotificationProvider } from './context/NotificationContext'
+import ErrorBoundary from './components/ErrorBoundary'
 
 // Auth screens
 const SplashScreen = lazy(() => import('./screens/auth/SplashScreen'))
@@ -68,7 +69,7 @@ const CampaignsModule = lazy(() => import('./modules/campaigns/CampaignsModule')
 
 // 🔥 Role Redirect
 function RoleRedirect() {
-  const { user, loading } = useAuth()
+  const { user, loading, isDemo } = useAuth()
   const [isTimedOut, setIsTimedOut] = useState(false)
 
   // 4. LOADING STATE FIX: Timeout after 3 seconds
@@ -128,13 +129,16 @@ function RoleRedirect() {
   
   if (role === 'admin') return <Navigate to="/admin/dashboard" replace />
   if (role === 'coach') {
-    return user.setupCompleted ? <Navigate to="/coach" replace /> : <Navigate to="/coach/profile-setup" replace />
+    // Demo users skip setup
+    return (isDemo || user.setupCompleted) ? <Navigate to="/coach" replace /> : <Navigate to="/coach/profile-setup" replace />
   }
-  if (role === 'player' || role === 'student') {
-    return user.setupCompleted ? <Navigate to="/student" replace /> : <Navigate to="/student/profile-setup" replace />
+  if (role === 'player' || role === 'student' || role === 'athlete') {
+    // Demo users skip setup
+    return (isDemo || user.setupCompleted) ? <Navigate to="/student" replace /> : <Navigate to="/student/profile-setup" replace />
   }
 
   // If role is something else unexpected
+  console.warn('[RoleRedirect] Unknown role:', role)
   return <Navigate to="/access-denied" replace />
 }
 
@@ -152,6 +156,7 @@ export default function App() {
       <AppContent>
         <NotificationProvider>
           <BrowserRouter>
+          <ErrorBoundary>
           <Suspense fallback={
             <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
               <div className="w-12 h-12 border-4 border-inverse-primary border-t-transparent rounded-full animate-spin"></div>
@@ -241,6 +246,7 @@ export default function App() {
 
             </Routes>
           </Suspense>
+          </ErrorBoundary>
           </BrowserRouter>
         </NotificationProvider>
       </AppContent>

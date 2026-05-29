@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useState, useEffect } from "react";
 
 export default function ProtectedRoute({ children, allowedRoles }) {
-  const { user, loading } = useAuth();
+  const { user, loading, isDemo } = useAuth();
   const [isTimedOut, setIsTimedOut] = useState(false);
 
   useEffect(() => {
@@ -36,9 +36,14 @@ export default function ProtectedRoute({ children, allowedRoles }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && !allowedRoles.some(role => role.toLowerCase().trim() === String(user.role).toLowerCase().trim())) {
-    console.warn('[ProtectedRoute] Role mismatch. User role:', user.role, 'Allowed:', allowedRoles);
-    return <Navigate to="/access-denied" replace />;
+  if (allowedRoles && !allowedRoles.some(r => r.toLowerCase().trim() === String(user.role).toLowerCase().trim())) {
+    // In demo mode, allow 'athlete' role to access 'player'/'student' routes
+    const isPlayerRoute = allowedRoles.some(r => ['player', 'student'].includes(r.toLowerCase()));
+    const isDemoAthlete = isDemo && user.role === 'player';
+    if (!(isPlayerRoute && isDemoAthlete)) {
+      console.warn('[ProtectedRoute] Role mismatch. User role:', user.role, 'Allowed:', allowedRoles);
+      return <Navigate to="/access-denied" replace />;
+    }
   }
 
   console.log('[ProtectedRoute] Access granted');

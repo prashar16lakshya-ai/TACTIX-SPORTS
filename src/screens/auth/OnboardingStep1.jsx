@@ -57,9 +57,10 @@ export default function OnboardingStep1({ nextStep, onDataChange, data }) {
           <button
             onClick={handleContinue}
             disabled={!data.role}
-            className="flex-1 md:flex-none px-12 py-4 bg-primary-container hover:bg-primary text-on-primary rounded-full font-headline-md text-body-md active:scale-95 transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] disabled:opacity-50 disabled:active:scale-100 font-bold tracking-widest"
+            className="flex-1 md:flex-none px-12 py-4 bg-primary hover:bg-primary-fixed text-on-primary rounded-xl font-bold text-body-md active:scale-[0.97] transition-all shadow-[0_4px_14px_rgba(220,20,60,0.3)] disabled:opacity-50 disabled:active:scale-100 uppercase tracking-widest flex items-center justify-center gap-2"
           >
             CONTINUE
+            <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>arrow_forward</span>
           </button>
         </div>
       </div>

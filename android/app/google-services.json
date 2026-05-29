@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "160203350263",
+    "project_id": "tactix-pwa-new-2026",
+    "storage_bucket": "tactix-pwa-new-2026.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:160203350263:android:d6b67bd908729088baf3f2",
+        "android_client_info": {
+          "package_name": "com.tactix.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "160203350263-sg3aiqcmafs3f3a56a6pq6lcbhpl91b5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tactix.app",
+            "certificate_hash": "ca29f8aa66735deb9bce330c6464d96c0ea44c77"
+          }
+        },
+        {
+          "client_id": "160203350263-i91r1ti78q56qct32psojgdhb4j9h6qp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpUSTGg7S06JglamLdCLuScMThudjFr84"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "160203350263-i91r1ti78q56qct32psojgdhb4j9h6qp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

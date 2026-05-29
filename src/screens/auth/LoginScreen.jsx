@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
@@ -16,6 +16,17 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // Auto-reset loading state after 10s to prevent stuck "Logging in..."
+  useEffect(() => {
+    if (!loading) return
+    const timeout = setTimeout(() => {
+      console.warn('[LoginScreen] Loading timeout — resetting')
+      setLoading(false)
+      setError('Login is taking too long. Please try again.')
+    }, 10000)
+    return () => clearTimeout(timeout)
+  }, [loading])
 
   // 🔐 EMAIL LOGIN
   const handleSubmit = async (e) => {
@@ -71,7 +82,7 @@ export default function LoginScreen() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#0A0A0A] flex items-center justify-center relative overflow-hidden font-body-md text-body-md text-on-surface">
+    <div className="min-h-dvh bg-background flex items-center justify-center relative overflow-hidden font-body-md text-body-md text-on-surface">
 
       {/* Animated background orbs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
@@ -198,6 +209,31 @@ export default function LoginScreen() {
           </svg>
           Continue with Google
         </button>
+
+        {/* Demo Mode */}
+        <div className="mt-6">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex-1 h-px bg-on-surface/10"></div>
+            <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Try Demo</span>
+            <div className="flex-1 h-px bg-on-surface/10"></div>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {['admin', 'coach', 'athlete'].map((demoRole) => (
+              <button
+                key={demoRole}
+                type="button"
+                onClick={() => {
+                  loginAsDemo(demoRole)
+                  navigate('/dashboard', { replace: true })
+                }}
+                disabled={loading}
+                className="h-11 bg-on-surface/5 border border-outline-variant/20 text-on-surface font-bold rounded-xl flex items-center justify-center text-label-sm uppercase tracking-wider hover:bg-[#DC143C]/10 hover:border-[#DC143C]/30 hover:text-[#DC143C] transition-all active:scale-[0.96] disabled:opacity-50"
+              >
+                {demoRole}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Footer CTA */}
         <div className="text-center mt-6">

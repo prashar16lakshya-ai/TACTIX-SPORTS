@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import DashboardSidebar from './DashboardSidebar'
 import DashboardHeader from './DashboardHeader'
@@ -9,7 +9,7 @@ export default function DashboardLayout({ children }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   return (
-    <div className="flex flex-col h-dvh bg-[#0A0A0A] font-lexend overflow-hidden">
+    <div className="flex flex-col h-dvh bg-background font-lexend overflow-hidden">
       {/* Top App Bar */}
       <DashboardHeader onMenuClick={() => setIsDrawerOpen(true)} />
 
@@ -29,7 +29,7 @@ export default function DashboardLayout({ children }) {
       )}
 
       {/* Scrollable content area */}
-      <main className="flex-1 overflow-y-auto bg-[#0A0A0A] pb-20 md:pb-8">
+      <main className="flex-1 overflow-y-auto bg-background pb-20 md:pb-8">
         <div className="max-w-5xl mx-auto px-4 py-5">
           {children}
 
