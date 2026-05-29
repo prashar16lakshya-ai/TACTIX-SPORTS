@@ -128,23 +128,40 @@ export default function PlayerComparison() {
         </div>
 
         {/* Stats Comparison */}
-        <div className="space-y-3 mb-8">
-          {stats.map((stat, i) => (
-            <div key={i} className="bg-on-surface/5 border border-outline-variant/30 rounded-xl p-4 flex items-center justify-between">
-              <div className="flex-1 flex justify-center items-center gap-2">
-                <span className={`material-symbols-outlined ${stat.color}`}>{stat.icon}</span>
-                <span className={`font-bold text-lg md:text-xl ${stat.v1 >= stat.v2 ? stat.color : 'text-on-surface/50'}`}>{stat.v1}</span>
-              </div>
+        <div className="space-y-4 mb-8">
+          {stats.map((stat, i) => {
+            // Determine maximum possible value for scaling the bars (mock max bounds)
+            const maxVal = typeof stat.v1 === 'string' && stat.v1.includes('%') ? 100 : Math.max(stat.v1, stat.v2, 10)
+            const getNum = (v) => typeof v === 'string' && v.includes('%') ? parseInt(v) : v
+            
+            const w1 = `${Math.min(100, Math.max(0, (getNum(stat.v1) / maxVal) * 100))}%`
+            const w2 = `${Math.min(100, Math.max(0, (getNum(stat.v2) / maxVal) * 100))}%`
 
-              <div className="flex-1 text-center">
-                <p className="text-on-surface/60 text-[10px] md:text-xs uppercase tracking-wider">{stat.label}</p>
-              </div>
+            return (
+              <div key={i} className="bg-surface-container border border-outline-variant/30 rounded-xl p-4 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className={`font-bold text-lg md:text-xl ${stat.v1 >= stat.v2 ? 'text-primary' : 'text-on-surface-variant'}`}>{stat.v1}</div>
+                  <div className="flex items-center gap-1.5 text-on-surface-variant">
+                    <span className="material-symbols-outlined text-[16px]">{stat.icon}</span>
+                    <span className="text-[10px] md:text-xs uppercase tracking-widest font-bold">{stat.label}</span>
+                  </div>
+                  <div className={`font-bold text-lg md:text-xl ${stat.v2 > stat.v1 ? 'text-secondary' : 'text-on-surface-variant'}`}>{stat.v2}</div>
+                </div>
 
-              <div className="flex-1 flex justify-center items-center gap-2">
-                <span className={`font-bold text-lg md:text-xl ${stat.v2 > stat.v1 ? 'text-[#FF1493]' : 'text-on-surface/50'}`}>{stat.v2}</span>
+                {/* Animated Bars */}
+                <div className="flex items-center gap-4">
+                  {/* Left Bar Container (Player 1) */}
+                  <div className="flex-1 h-2 bg-on-surface/10 rounded-full flex justify-end overflow-hidden">
+                    <div className="h-full bg-primary rounded-full transition-all duration-1000 ease-out" style={{ width: w1 }}></div>
+                  </div>
+                  {/* Right Bar Container (Player 2) */}
+                  <div className="flex-1 h-2 bg-on-surface/10 rounded-full flex justify-start overflow-hidden">
+                    <div className="h-full bg-secondary rounded-full transition-all duration-1000 ease-out" style={{ width: w2 }}></div>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
 

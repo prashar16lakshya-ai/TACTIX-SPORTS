@@ -63,7 +63,46 @@ export default function StudentProfile() {
           )}
         </div>
 
-        {/* My Fitness Stats (Removed) */}
+        {/* Athlete Team Integration */}
+        <div className="bg-surface-container rounded-xl p-6 border border-outline-variant/30 flex flex-col gap-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="material-symbols-outlined text-primary">group_add</span>
+            <h2 className="text-title-lg font-inter font-bold text-on-surface">Team Integration</h2>
+          </div>
+          
+          <p className="text-body-sm font-lexend text-on-surface-variant">
+            Enter the 6-digit code provided by your coach to join a new team roster.
+          </p>
+
+          <div className="flex gap-2 mt-2">
+            <input 
+              type="text" 
+              placeholder="e.g. TX-9X2P" 
+              maxLength={8}
+              className="flex-1 bg-surface-container-high border border-outline-variant/50 rounded-lg px-4 h-12 text-on-surface font-lexend text-body-lg outline-none focus:border-primary uppercase tracking-widest placeholder:normal-case placeholder:tracking-normal"
+            />
+            <button className="h-12 px-6 bg-primary text-on-primary rounded-lg font-bold font-lexend hover:bg-primary/90 transition-colors">
+              Join
+            </button>
+          </div>
+          
+          <div className="mt-4 pt-4 border-t border-outline-variant/20 flex flex-col gap-3">
+            <h3 className="text-label-md font-lexend font-bold text-on-surface-variant uppercase tracking-widest">Active Teams</h3>
+            
+            <div className="flex items-center justify-between p-3 rounded-lg bg-surface-container-low border border-surface-container hover:border-outline-variant/30 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                  <span className="material-symbols-outlined text-[20px]">sports_soccer</span>
+                </div>
+                <div>
+                  <p className="text-label-lg font-bold font-inter text-on-surface">Varsity Football</p>
+                  <p className="text-label-sm font-lexend text-on-surface-variant">Coach Sarah Connor</p>
+                </div>
+              </div>
+              <span className="material-symbols-outlined text-on-surface-variant text-[18px]">chevron_right</span>
+            </div>
+          </div>
+        </div>
 
         <button
           onClick={async () => {

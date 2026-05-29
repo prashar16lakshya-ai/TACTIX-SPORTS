@@ -46,8 +46,17 @@ export default function LoginScreen() {
       }
 
       setLoading(false)
-      navigate('/dashboard', { replace: true })
-
+      
+      const role = String(result.user?.role || '').toLowerCase().trim()
+      if (role === 'admin') {
+        navigate('/admin/dashboard', { replace: true })
+      } else if (role === 'coach') {
+        navigate('/coach', { replace: true })
+      } else if (role === 'player' || role === 'student' || role === 'athlete') {
+        navigate('/student', { replace: true })
+      } else {
+        navigate('/dashboard', { replace: true }) // fallback
+      }
     } catch (err) {
       console.error('[LoginScreen] Unexpected error:', err)
       setError('Something went wrong. Try again.')
@@ -72,8 +81,17 @@ export default function LoginScreen() {
       }
 
       setLoading(false)
-      navigate('/dashboard', { replace: true })
 
+      const role = String(result.user?.role || '').toLowerCase().trim()
+      if (role === 'admin') {
+        navigate('/admin/dashboard', { replace: true })
+      } else if (role === 'coach') {
+        navigate('/coach', { replace: true })
+      } else if (role === 'player' || role === 'student' || role === 'athlete') {
+        navigate('/student', { replace: true })
+      } else {
+        navigate('/dashboard', { replace: true }) // fallback
+      }
     } catch (err) {
       console.error('[LoginScreen] Google login error:', err)
       setError('Google login failed.')

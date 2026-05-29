@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
@@ -53,13 +54,14 @@ export default function DashboardSidebar({ onClose }) {
   const { logout, user } = useAuth()
   const navigate = useNavigate()
 
-  const role = user?.role?.toLowerCase()
-  const normalizedRole = role === 'player' ? 'student' : role
-
-  const filteredGroups = DRAWER_GROUPS.map(g => ({
-    ...g,
-    items: g.items.filter(item => !item.roles || item.roles.includes(normalizedRole) || item.roles.includes(role)),
-  })).filter(g => g.items.length > 0)
+  const filteredGroups = useMemo(() => {
+    const role = user?.role?.toLowerCase()
+    const normalizedRole = role === 'player' ? 'student' : role
+    return DRAWER_GROUPS.map(g => ({
+      ...g,
+      items: g.items.filter(item => !item.roles || item.roles.includes(normalizedRole) || item.roles.includes(role)),
+    })).filter(g => g.items.length > 0)
+  }, [user?.role])
 
   const handleNav = (path) => {
     navigate(path)
@@ -68,6 +70,7 @@ export default function DashboardSidebar({ onClose }) {
 
   const handleLogout = () => {
     if (window.confirm("Are you sure you want to log out?")) {
+      navigate('/login', { replace: true })
       logout()
       onClose?.()
     }

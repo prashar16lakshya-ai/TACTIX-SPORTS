@@ -254,8 +254,11 @@ export function AuthProvider({ children }) {
     setLoading(true)
     try {
       const result = await firebaseLogin(email, password)
+      // Hydrate profile immediately so callers know the role
+      const profile = await hydrateUser(result.user)
+      setUser(profile)
       setLoading(false)
-      return { success: true, user: result.user }
+      return { success: true, user: profile }
     } catch (err) {
       setLoading(false)
       return { success: false, error: friendlyAuthError(err) }
@@ -297,8 +300,10 @@ export function AuthProvider({ children }) {
         }
       }
 
+      const profile = await hydrateUser(firebaseUser)
+      setUser(profile)
       setLoading(false)
-      return { success: true, user: firebaseUser }
+      return { success: true, user: profile }
     } catch (err) {
       setLoading(false)
 
@@ -314,8 +319,9 @@ export function AuthProvider({ children }) {
   }
 
   const logout = async () => {
-    await firebaseLogout()
     setUser(null)
+    setLoading(false)
+    await firebaseLogout()
   }
 
   const updateSession = (newData) => {
