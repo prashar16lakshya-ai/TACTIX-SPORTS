@@ -17,39 +17,6 @@ export default function LoginScreen() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // 🎭 DEMO LOGIN
-  const handleDemoLogin = async (role) => {
-    setLoading(true)
-    setError('')
-    
-    let demoEmail = '';
-    let demoPassword = '';
-    
-    if (role === 'admin') {
-      demoEmail = 'admin@tactix.io';
-      demoPassword = 'Admin@123';
-    } else if (role === 'coach') {
-      demoEmail = 'coach@tactix.io';
-      demoPassword = 'Coach@123';
-    } else if (role === 'student') {
-      demoEmail = 'athlete@tactix.io';
-      demoPassword = 'Athlete@123';
-    }
-
-    try {
-      const result = await login(demoEmail, demoPassword)
-      if (result?.success) {
-        navigate('/dashboard', { replace: true })
-      } else {
-        setError(result?.error || 'Demo login failed.')
-      }
-    } catch (err) {
-      setError('Demo login failed.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
   // 🔐 EMAIL LOGIN
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -231,50 +198,6 @@ export default function LoginScreen() {
           </svg>
           Continue with Google
         </button>
-
-        {/* Demo Mode Section */}
-        <div className="mt-10 pt-8 border-t border-outline-variant/30">
-          <div className="text-center mb-6">
-            <h3 className="text-on-surface font-black text-[10px] tracking-[0.3em] uppercase opacity-50">Quick Preview</h3>
-            <h2 className="text-on-surface font-black text-lg uppercase tracking-tight">Try Demo Mode</h2>
-          </div>
-          
-          <div className="flex flex-col gap-3">
-            {[
-              { id: 'admin',   icon: 'shield',        title: 'Administrator', desc: 'School management & oversight', color: 'from-red-600 to-rose-500' },
-              { id: 'coach',   icon: 'sports_soccer', title: 'Sports Coach',  desc: 'Team performance & attendance', color: 'from-emerald-500 to-teal-500' },
-              { id: 'student', icon: 'person',        title: 'Student Athlete',desc: 'Personal stats & leaderboard', color: 'from-orange-500 to-amber-500' }
-            ].map((role) => (
-              <button
-                key={role.id}
-                type="button"
-                onClick={() => handleDemoLogin(role.id)}
-                disabled={loading}
-                className="group relative flex items-center gap-4 p-4 bg-on-surface/5 border border-outline-variant/30 rounded-2xl hover:bg-on-surface/10 hover:border-outline-variant/50 transition-all active:scale-[0.98] text-left overflow-hidden"
-              >
-                {/* Animated Gradient Background */}
-                <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity bg-gradient-to-r ${role.color}`}></div>
-                
-                {/* Icon Container */}
-                <div className={`w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br ${role.color} flex items-center justify-center shadow-lg`}>
-                  <span className="material-symbols-outlined text-on-surface text-[24px]">{role.icon}</span>
-                </div>
-
-                {/* Text Content */}
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-on-surface font-black text-xs uppercase tracking-widest">{role.title}</h4>
-                  <p className="text-on-surface/40 text-[10px] uppercase tracking-wider mt-0.5 truncate">{role.desc}</p>
-                </div>
-
-                {/* Arrow */}
-                <span className="material-symbols-outlined text-on-surface/20 group-hover:text-on-surface/60 transition-colors text-[20px]">chevron_right</span>
-              </button>
-            ))}
-          </div>
-          <p className="text-center text-[9px] text-on-surface/20 uppercase tracking-[0.2em] mt-6">
-            Log in for full data persistence
-          </p>
-        </div>
 
         {/* Footer CTA */}
         <div className="text-center mt-6">

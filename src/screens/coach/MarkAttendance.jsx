@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import StarRating from '../../components/StarRating'
 import Toast from '../../components/Toast'
 import { useAppData } from '../../context/AppDataContext'
+import { useAuth } from '../../context/AuthContext'
 
 export default function MarkAttendance() {
   const navigate = useNavigate()
   const { data, setAttendanceForDate, appendActivityLog } = useAppData()
+  const { user } = useAuth()
   const todayKey = new Date().toISOString().slice(0, 10)
   const isHoliday = data.holidays?.some(h => h.date === todayKey) || false
   const defaultRows = (data.players || []).map((player, index) => ({

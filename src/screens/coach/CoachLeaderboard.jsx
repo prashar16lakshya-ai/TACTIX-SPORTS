@@ -36,7 +36,7 @@ export default function CoachLeaderboard({ data }) {
           </div>
         </section>
 
-        {PLAYERS.length > 0 ? (
+        {players.length > 0 ? (
           <>
             {/* Podium */}
             <section className="px-6 py-8 flex items-end justify-center gap-4">
