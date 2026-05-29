@@ -1,5 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { App as CapacitorApp } from '@capacitor/app'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { AppDataProvider } from './context/AppDataContext'
 import ProtectedRoute from "./components/ProtectedRoute"
@@ -150,12 +151,46 @@ function AppContent({ children }) {
   )
 }
 
+function CapacitorHardwareBackButton() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleBackButton = async ({ canGoBack }) => {
+      // If we're on the dashboard or root login screen, exit the app
+      if (
+        location.pathname === '/' || 
+        location.pathname === '/login' ||
+        location.pathname.includes('/dashboard') ||
+        location.pathname === '/coach' ||
+        location.pathname === '/student'
+      ) {
+        await CapacitorApp.exitApp();
+      } else if (canGoBack) {
+        // Otherwise, navigate back in history
+        navigate(-1);
+      } else {
+        await CapacitorApp.exitApp();
+      }
+    };
+
+    const listener = CapacitorApp.addListener('backButton', handleBackButton);
+
+    return () => {
+      listener.then(l => l.remove());
+    };
+  }, [location, navigate]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <AuthProvider>
       <AppContent>
         <NotificationProvider>
           <BrowserRouter>
+          <CapacitorHardwareBackButton />
           <ErrorBoundary>
           <Suspense fallback={
             <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
