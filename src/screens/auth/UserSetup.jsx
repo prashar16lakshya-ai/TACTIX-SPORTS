@@ -4,11 +4,14 @@ import { useAuth } from '../../context/AuthContext'
 import { useAppData } from '../../context/AppDataContext'
 import { db } from '../../firebase'
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
-import { SPORTS_LIST } from '../../data/indianDemoData'
 import Logo from '../../components/common/Logo'
 
 const CLASS_OPTIONS = ['LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
 const SECTION_OPTIONS = ['A', 'B', 'C', 'D', 'E', 'F']
+const SPORTS_LIST = [
+  'Cricket', 'Athletics', 'Badminton', 'Basketball', 'Football',
+  'Tennis', 'Table Tennis', 'Swimming', 'Volleyball', 'Kabaddi', 'Hockey'
+]
 
 export default function UserSetup() {
   const { user, updateSession } = useAuth()

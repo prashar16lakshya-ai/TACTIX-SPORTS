@@ -2,7 +2,6 @@ import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../components/dashboard/DashboardLayout'
 import BottomNav from '../../components/BottomNav'
-import { GROUPS, DEMO_CSV_CONTENT } from '../../data/indianDemoData'
 import { useAppData } from '../../context/AppDataContext'
 import { useAuth } from '../../context/AuthContext'
 import Papa from 'papaparse'
@@ -15,6 +14,11 @@ const FIELDS = [
   { key: 'position', label: 'Position', required: true },
   { key: 'teamName', label: 'Team Name', required: true },
 ]
+
+const DEMO_CSV_CONTENT = `name,position,teamName
+Aarav Mehta,Batsman,Cheetah XI
+Priya Sharma,Bowler,Cheetah XI
+Rohan Verma,All Rounder,Cheetah XI`;
 
 const STEPS = ['Upload File', 'Map Columns', 'Assign & Import']
 
@@ -212,7 +216,7 @@ export default function BulkImport() {
 
   const displayName = data?.profile?.name || user?.name || user?.displayName || 'Coach'
   const COACH = { name: displayName }
-  const selectedGroupObj = GROUPS.find(g => g.id === assignGroup)
+  const selectedGroupObj = (data?.groups || []).find(g => g.id === assignGroup)
 
   return (
     <DashboardLayout>
@@ -445,7 +449,7 @@ export default function BulkImport() {
                   className="bg-neutral-900 border border-outline-variant rounded-xl text-on-surface p-3 outline-none focus:border-[#0cca75] text-sm"
                 >
                   <option value="">-- Select Group --</option>
-                  {GROUPS.map(g => <option key={g.id} value={g.id}>{g.name} ({g.sport})</option>)}
+                  {(data?.groups || []).map(g => <option key={g.id} value={g.id}>{g.name} ({g.sport})</option>)}
                   <option value="unassigned">Unassigned</option>
                 </select>
               </div>

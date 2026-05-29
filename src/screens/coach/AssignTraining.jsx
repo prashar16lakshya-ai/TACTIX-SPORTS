@@ -1,14 +1,16 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../../context/AuthContext';
+import { useAppData } from '../../context/AppDataContext';
 import TopBar from '../../components/TopBar';
 import BottomNav from '../../components/BottomNav';
 
 export default function AssignTraining() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { data } = useAppData();
   
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -19,7 +21,7 @@ export default function AssignTraining() {
     type: 'Physical',
     equipment: '',
     assignType: 'team', // team, specific, individual
-    teamId: 'Cheetah XI', // mock team
+    teamId: data?.groups?.[0]?.id || '',
     startDate: '',
     dueDate: '',
   });
@@ -30,13 +32,6 @@ export default function AssignTraining() {
     
     setLoading(true);
     try {
-      if (user?.isDemo) {
-        // Simulate network delay for realistic UX
-        await new Promise(resolve => setTimeout(resolve, 800));
-        alert('Demo Mode: Training assignment simulated successfully!');
-        navigate(-1);
-        return;
-      }
 
       await addDoc(collection(db, 'trainings'), {
         ...formData,
@@ -211,8 +206,9 @@ export default function AssignTraining() {
                 onChange={e => setFormData(prev => ({ ...prev, teamId: e.target.value }))}
                 className="w-full bg-[#111111] border border-outline-variant/30 rounded-xl p-4 pl-16 text-on-surface font-bold outline-none focus:border-[#DC143C] appearance-none"
               >
-                <option value="Cheetah XI">Cheetah XI</option>
-                <option value="Thunderbolts">Thunderbolts</option>
+                {data?.groups?.map(g => (
+                  <option key={g.id} value={g.id}>{g.name}</option>
+                ))}
               </select>
               <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface/40 pointer-events-none">expand_more</span>
             </div>

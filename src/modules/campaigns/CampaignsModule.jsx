@@ -1,66 +1,26 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../../components/TopBar';
 import BottomNav from '../../components/BottomNav';
-
-const MOCK_CAMPAIGNS = [
-  {
-    id: 1,
-    title: 'Summer Football Challenge',
-    description: 'Encourage players to participate in summer training sessions and improve their skills.',
-    dateRange: 'May 20 – Jun 30, 2025',
-    targetGroup: 'All Players',
-    status: 'Active',
-    progress: 75,
-    imageColor: 'from-[#DC143C] to-[#4F46E5]',
-    statusColor: 'text-green-400 bg-green-400/10 border-green-400/20'
-  },
-  {
-    id: 2,
-    title: 'Basketball Skills Boost',
-    description: 'Special focus on shooting, dribbling and team coordination.',
-    dateRange: 'Jun 5 – Jul 5, 2025',
-    targetGroup: 'Basketball Team',
-    status: 'Active',
-    progress: 60,
-    imageColor: 'from-[#FF1493] to-[#0052FF]',
-    statusColor: 'text-green-400 bg-green-400/10 border-green-400/20'
-  },
-  {
-    id: 3,
-    title: 'Fitness for Champions',
-    description: 'Build endurance and strength with personalized fitness programs.',
-    dateRange: 'Jul 10 – Aug 10, 2025',
-    targetGroup: 'All Teams',
-    status: 'Upcoming',
-    startsIn: 10, // days
-    imageColor: 'from-orange-500 to-yellow-500',
-    statusColor: 'text-orange-400 bg-orange-400/10 border-orange-400/20'
-  },
-  {
-    id: 4,
-    title: 'Cricket Excellence Camp',
-    description: 'Advanced training camp for selected cricket players.',
-    dateRange: 'Aug 1 – Aug 20, 2025',
-    targetGroup: 'Cricket Team',
-    status: 'Completed',
-    progress: 100,
-    imageColor: 'from-red-500 to-pink-500',
-    statusColor: 'text-red-400 bg-red-400/10 border-red-400/20'
-  }
-];
+import { useAppData } from '../../context/AppDataContext';
+import EmptyState from '../../components/common/EmptyState';
 
 export default function CampaignsModule() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('All Campaigns');
-  const [searchQuery, setSearchQuery] = useState('');
+  const { data } = useAppData();
+  const campaigns = data?.campaigns || [];
 
-  const filteredCampaigns = MOCK_CAMPAIGNS.filter(campaign => {
+  const filteredCampaigns = campaigns.filter(campaign => {
     const matchesTab = activeTab === 'All Campaigns' || campaign.status === activeTab;
-    const matchesSearch = campaign.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          campaign.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = campaign.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          campaign.description?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesTab && matchesSearch;
   });
+
+  const activeCount = campaigns.filter(c => c.status === 'Active').length;
+  const upcomingCount = campaigns.filter(c => c.status === 'Upcoming').length;
+  const completedCount = campaigns.filter(c => c.status === 'Completed').length;
 
   return (
     <div className="min-h-dvh bg-background flex flex-col font-lexend pb-24">
@@ -82,22 +42,22 @@ export default function CampaignsModule() {
         <div className="grid grid-cols-4 gap-3">
           <div className="bg-[#111111] rounded-2xl p-4 flex flex-col justify-center items-center relative overflow-hidden border border-white/5">
             <span className="material-symbols-outlined text-[#FF1493] text-[24px] absolute left-3 top-3">rocket_launch</span>
-            <div className="text-3xl font-black text-on-surface mt-4">6</div>
+            <div className="text-3xl font-black text-on-surface mt-4">{campaigns.length}</div>
             <div className="text-[10px] text-on-surface/50 uppercase tracking-wider mt-1">Total Campaigns</div>
           </div>
           <div className="bg-[#111111] rounded-2xl p-4 flex flex-col justify-center items-center relative overflow-hidden border border-white/5">
             <span className="material-symbols-outlined text-green-400 text-[24px] absolute left-3 top-3">play_arrow</span>
-            <div className="text-3xl font-black text-green-400 mt-4">3</div>
+            <div className="text-3xl font-black text-green-400 mt-4">{activeCount}</div>
             <div className="text-[10px] text-on-surface/50 uppercase tracking-wider mt-1">Active</div>
           </div>
           <div className="bg-[#111111] rounded-2xl p-4 flex flex-col justify-center items-center relative overflow-hidden border border-white/5">
             <span className="material-symbols-outlined text-orange-400 text-[24px] absolute left-3 top-3">schedule</span>
-            <div className="text-3xl font-black text-orange-400 mt-4">2</div>
+            <div className="text-3xl font-black text-orange-400 mt-4">{upcomingCount}</div>
             <div className="text-[10px] text-on-surface/50 uppercase tracking-wider mt-1">Upcoming</div>
           </div>
           <div className="bg-[#111111] rounded-2xl p-4 flex flex-col justify-center items-center relative overflow-hidden border border-white/5">
             <span className="material-symbols-outlined text-red-400 text-[24px] absolute left-3 top-3">check_circle</span>
-            <div className="text-3xl font-black text-red-400 mt-4">1</div>
+            <div className="text-3xl font-black text-red-400 mt-4">{completedCount}</div>
             <div className="text-[10px] text-on-surface/50 uppercase tracking-wider mt-1">Completed</div>
           </div>
         </div>
@@ -210,10 +170,13 @@ export default function CampaignsModule() {
           ))}
           
           {filteredCampaigns.length === 0 && (
-            <div className="text-center py-12 text-on-surface/30">
-              <span className="material-symbols-outlined text-4xl mb-2">search_off</span>
-              <p className="text-sm">No campaigns found.</p>
-            </div>
+            <EmptyState
+              icon="campaign"
+              title="No campaigns found"
+              description={campaigns.length === 0 ? "You haven't created any campaigns yet." : "No campaigns match your filters."}
+              actionLabel="Create Campaign"
+              onAction={() => alert('Add Campaign clicked')}
+            />
           )}
         </div>
       </main>

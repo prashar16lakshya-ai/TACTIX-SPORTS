@@ -32,59 +32,13 @@ function friendlyAuthError(error) {
   return map[code] || error?.message || 'Something went wrong. Try again.'
 }
 
-// Demo user profiles for preview mode
-const DEMO_PROFILES = {
-  admin: {
-    uid: 'demo-admin',
-    email: 'admin@tactix.demo',
-    name: 'Demo Admin',
-    role: 'admin',
-    initials: 'DA',
-    schoolId: 'DEMO-SCHOOL',
-    schoolName: 'TACTIX Demo Academy',
-    sport: 'Football',
-    teamName: 'Demo Team',
-    isDemo: true,
-    setupCompleted: true,
-  },
-  coach: {
-    uid: 'demo-coach',
-    email: 'coach@tactix.demo',
-    name: 'Demo Coach',
-    role: 'coach',
-    initials: 'DC',
-    schoolId: 'DEMO-SCHOOL',
-    schoolName: 'TACTIX Demo Academy',
-    sport: 'Football',
-    teamName: 'Demo Team',
-    teamId: 'DEMO-TEAM',
-    isDemo: true,
-    setupCompleted: true,
-  },
-  athlete: {
-    uid: 'demo-athlete',
-    email: 'athlete@tactix.demo',
-    name: 'Demo Athlete',
-    role: 'player',
-    initials: 'DA',
-    schoolId: 'DEMO-SCHOOL',
-    schoolName: 'TACTIX Demo Academy',
-    sport: 'Football',
-    teamName: 'Demo Team',
-    teamId: 'DEMO-TEAM',
-    isDemo: true,
-    setupCompleted: true,
-  },
-}
-
-const DEMO_STORAGE_KEY = 'tactix_demo_role'
+// Demo user profiles removed
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [isDemo, setIsDemo] = useState(false)
 
   // 🔥 SAFE USER HYDRATION (FIXED)
   const hydrateUser = async (firebaseUser) => {
@@ -143,15 +97,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     console.log('[AuthContext] Setting up auth listener')
 
-    // Check for saved demo session
-    const savedDemo = localStorage.getItem(DEMO_STORAGE_KEY)
-    if (savedDemo && DEMO_PROFILES[savedDemo]) {
-      console.log('[AuthContext] Restoring demo session:', savedDemo)
-      setUser(DEMO_PROFILES[savedDemo])
-      setIsDemo(true)
-      setLoading(false)
-      return // Don't set up Firebase listener for demo mode
-    }
+    console.log('[AuthContext] Setting up auth listener')
 
     // Check for Google redirect result (Capacitor)
     checkGoogleRedirectResult()
@@ -337,28 +283,6 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const loginAsDemo = (role) => {
-    const normalizedRole = role.toLowerCase()
-    const profile = DEMO_PROFILES[normalizedRole]
-    if (!profile) {
-      console.error('[AuthContext] Invalid demo role:', role)
-      return
-    }
-    console.log('[AuthContext] Entering demo mode as:', normalizedRole)
-    localStorage.setItem(DEMO_STORAGE_KEY, normalizedRole)
-    setIsDemo(true)
-    setUser(profile)
-    setLoading(false)
-  }
-
-  const exitDemoMode = async () => {
-    console.log('[AuthContext] Exiting demo mode')
-    localStorage.removeItem(DEMO_STORAGE_KEY)
-    setIsDemo(false)
-    setUser(null)
-    setLoading(false)
-  }
-
   return (
     <AuthContext.Provider
       value={{
@@ -368,9 +292,7 @@ export function AuthProvider({ children }) {
         signup,
         login,
         loginWithGoogle,
-        loginAsDemo,
-        exitDemoMode,
-        logout: isDemo ? exitDemoMode : logout,
+        logout,
         updateSession,
         resetPassword
       }}

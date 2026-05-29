@@ -70,26 +70,11 @@ const CampaignsModule = lazy(() => import('./modules/campaigns/CampaignsModule')
 
 // 🔥 Role Redirect
 function RoleRedirect() {
-  const { user, loading, isDemo } = useAuth()
-  const [isTimedOut, setIsTimedOut] = useState(false)
+  const { user, loading } = useAuth()
 
-  // 4. LOADING STATE FIX: Timeout after 3 seconds
-  useEffect(() => {
-    let timer;
-    if (loading) {
-      timer = setTimeout(() => {
-        console.warn('[RoleRedirect] Loading timeout reached');
-        setIsTimedOut(true);
-      }, 3000);
-    } else {
-      setIsTimedOut(false);
-    }
-    return () => clearTimeout(timer);
-  }, [loading]);
+  console.log('[RoleRedirect] State:', { user: user?.uid, loading, role: user?.role })
 
-  console.log('[RoleRedirect] State:', { user: user?.uid, loading, role: user?.role, isTimedOut })
-
-  if (loading && !isTimedOut) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
         <div className="w-12 h-12 border-4 border-inverse-primary border-t-transparent rounded-full animate-spin"></div>
@@ -130,12 +115,10 @@ function RoleRedirect() {
   
   if (role === 'admin') return <Navigate to="/admin/dashboard" replace />
   if (role === 'coach') {
-    // Demo users skip setup
-    return (isDemo || user.setupCompleted) ? <Navigate to="/coach" replace /> : <Navigate to="/coach/profile-setup" replace />
+    return user.setupCompleted ? <Navigate to="/coach" replace /> : <Navigate to="/coach/profile-setup" replace />
   }
   if (role === 'player' || role === 'student' || role === 'athlete') {
-    // Demo users skip setup
-    return (isDemo || user.setupCompleted) ? <Navigate to="/student" replace /> : <Navigate to="/student/profile-setup" replace />
+    return user.setupCompleted ? <Navigate to="/student" replace /> : <Navigate to="/student/profile-setup" replace />
   }
 
   // If role is something else unexpected

@@ -6,36 +6,43 @@ import DashboardLayout from '../../components/dashboard/DashboardLayout'
 import BottomNav from '../../components/BottomNav'
 import Toast from '../../components/Toast'
 import { generateParentReportPDF, sharePDF } from '../../utils/pdfShare'
-
-const DEMO_PLAYER = { name: 'Priya Sharma', team: 'Cheetah XI', school: 'Delhi Public School, Gurugram', sport: 'Cricket', class: '11-A' }
-const DEMO_ATTENDANCE = { present: 24, absent: 4, holidays: 2, total: 30, percentage: 86 }
-const DEMO_PERFORMANCE = [
-  { date: 'May 01', score: 78 }, { date: 'May 05', score: 82 }, { date: 'May 10', score: 85 },
-  { date: 'May 15', score: 88 }, { date: 'May 20', score: 91 }, { date: 'May 25', score: 94 },
-]
-const DEMO_REMARKS = [
-  { date: 'May 22', text: 'Excellent improvement in batting technique. Shows great potential.' },
-  { date: 'May 15', text: 'Good leadership during practice. Needs to work on fielding.' },
-  { date: 'May 08', text: 'Consistent performer. Recommended for district selection trials.' },
-]
-const DEMO_FITNESS = {
-  beepTest: { score: 8.5, avg: 7.9, status: 'above' },
-  pushups: { score: 30, avg: 26, status: 'above' },
-  sitAndReach: { score: 32, avg: 28, status: 'above' },
-}
+import EmptyState from '../../components/common/EmptyState'
 
 export default function ParentReportCard() {
   const [searchParams] = useSearchParams()
   const { user } = useAuth()
-  const { isDemoMode } = useAppData()
+  const { data } = useAppData()
   const [toast, setToast] = useState(null)
   const [generating, setGenerating] = useState(false)
 
-  const player = DEMO_PLAYER
-  const attendance = DEMO_ATTENDANCE
-  const performance = DEMO_PERFORMANCE
-  const remarks = DEMO_REMARKS
-  const fitness = DEMO_FITNESS
+  const playerId = searchParams.get('playerId')
+  const player = data?.players?.find(p => p.id === playerId)
+
+  if (!player) {
+    return (
+      <DashboardLayout>
+        <EmptyState
+          icon="person_off"
+          title="Player Not Found"
+          description="Please select a player to generate a report card."
+          actionLabel="Go Back"
+          onAction={() => window.history.back()}
+        />
+      </DashboardLayout>
+    )
+  }
+
+  const attendance = {
+    present: player.attendanceStats?.attended || 0,
+    absent: (player.attendanceStats?.total || 0) - (player.attendanceStats?.attended || 0),
+    holidays: 0,
+    total: player.attendanceStats?.total || 0,
+    percentage: player.attendanceStats?.percentage || 0
+  }
+  
+  const performance = player.performanceHistory || []
+  const remarks = player.remarks || []
+  const fitness = player.fitness || {}
 
   const attColor = attendance.percentage > 75 ? 'text-green-500' : attendance.percentage > 50 ? 'text-yellow-500' : 'text-red-500'
   const attBg = attendance.percentage > 75 ? 'bg-green-500' : attendance.percentage > 50 ? 'bg-yellow-500' : 'bg-red-500'
@@ -142,23 +149,26 @@ export default function ParentReportCard() {
                 <span className="material-symbols-outlined text-green-500 text-[18px]">trending_up</span>
                 Performance Trend
               </h4>
-              <div className="flex items-end gap-2 h-24 px-2">
-                {performance.map((p, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <div
-                      className="w-full bg-gradient-to-t from-[#DC143C] to-[#FF1493] rounded-t-lg transition-all animate-fill-bar"
-                      style={{ height: `${p.score}%`, maxHeight: '100%' }}
-                    />
-                    <span className="text-[8px] text-on-surface/30 font-bold">{p.date.split(' ')[1]}</span>
+              {performance.length > 0 ? (
+                <>
+                  <div className="flex items-end gap-2 h-24 px-2">
+                    {performance.map((p, i) => (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                        <div
+                          className="w-full bg-gradient-to-t from-[#DC143C] to-[#FF1493] rounded-t-lg transition-all animate-fill-bar"
+                          style={{ height: `${p.score}%`, maxHeight: '100%' }}
+                        />
+                        <span className="text-[8px] text-on-surface/30 font-bold">{p.date?.split(' ')?.[1] || p.date}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <div className="flex justify-between mt-3 text-[10px]">
-                <span className="text-on-surface/40">Avg: <strong className="text-on-surface">{Math.round(performance.reduce((a, b) => a + b.score, 0) / performance.length)}/100</strong></span>
-                <span className="text-green-500 font-bold flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[12px]">trending_up</span> Improving
-                </span>
-              </div>
+                  <div className="flex justify-between mt-3 text-[10px]">
+                    <span className="text-on-surface/40">Avg: <strong className="text-on-surface">{Math.round(performance.reduce((a, b) => a + (b.score || 0), 0) / Math.max(performance.length, 1))}/100</strong></span>
+                  </div>
+                </>
+              ) : (
+                <div className="text-on-surface/40 text-xs italic py-4">No performance history available.</div>
+              )}
             </div>
 
             {/* Coach Remarks */}
@@ -168,12 +178,14 @@ export default function ParentReportCard() {
                 Coach Remarks
               </h4>
               <div className="flex flex-col gap-3">
-                {remarks.map((r, i) => (
+                {remarks.length > 0 ? remarks.map((r, i) => (
                   <div key={i} className="bg-[#0A0A0A]/50 border border-white/5 rounded-xl p-4">
                     <p className="text-on-surface/70 text-sm italic">"{r.text}"</p>
                     <p className="text-on-surface/30 text-[10px] mt-2 font-bold">{r.date}</p>
                   </div>
-                ))}
+                )) : (
+                  <div className="text-on-surface/40 text-xs italic py-2">No remarks added yet.</div>
+                )}
               </div>
             </div>
 
@@ -184,7 +196,7 @@ export default function ParentReportCard() {
                 Fitness Test Results
               </h4>
               <div className="grid grid-cols-1 gap-3">
-                {Object.entries(fitness).map(([key, val]) => {
+                {Object.keys(fitness).length > 0 ? Object.entries(fitness).map(([key, val]) => {
                   const label = key === 'beepTest' ? 'Beep Test Level' : key === 'pushups' ? 'Push-up Count' : 'Sit & Reach (cm)'
                   const statusColor = val.status === 'above' ? 'text-green-500 bg-green-500/10 border-green-500/20' : val.status === 'below' ? 'text-red-500 bg-red-500/10 border-red-500/20' : 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20'
                   const statusLabel = val.status === 'above' ? 'Above Avg' : val.status === 'below' ? 'Below Avg' : 'Average'
@@ -200,7 +212,9 @@ export default function ParentReportCard() {
                       </div>
                     </div>
                   )
-                })}
+                }) : (
+                  <div className="text-on-surface/40 text-xs italic py-2">No fitness test records found.</div>
+                )}
               </div>
             </div>
 

@@ -1,14 +1,16 @@
-﻿import { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import DashboardLayout from '../../components/dashboard/DashboardLayout'
 import Toast from '../../components/Toast'
 import { useAppData } from '../../context/AppDataContext'
 import { useAuth } from '../../context/AuthContext'
+import { collection, addDoc } from 'firebase/firestore'
+import { db } from '../../firebase'
 
 const monthLabel = (date) => date.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })
 const dateKey = (date) => date.toISOString().slice(0, 10)
 
 export default function Holidays() {
-  const { data, setHoliday, appendActivityLog } = useAppData()
+  const { data, appendActivityLog } = useAppData()
   const { user } = useAuth()
   const [viewDate, setViewDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState(new Date())
@@ -29,7 +31,7 @@ export default function Holidays() {
     return cells
   }, [viewDate])
 
-  const handleMarkHoliday = () => {
+  const handleMarkHoliday = async () => {
     if (!title.trim() || !reason.trim()) {
       setToast({ message: 'Title and Reason are required.', type: 'error' })
       return
@@ -44,11 +46,16 @@ export default function Holidays() {
       createdAt: new Date().toISOString()
     }
 
-    setHoliday(holidayData)
-    appendActivityLog(`Holiday marked: ${title} on ${selectedDate.toLocaleDateString('en-IN')}`, 'holiday')
-    setToast({ message: 'Holiday broadcasted successfully!', type: 'success' })
-    setTitle('')
-    setReason('')
+    try {
+      await addDoc(collection(db, 'holidays'), holidayData)
+      appendActivityLog(`Holiday marked: ${title} on ${selectedDate.toLocaleDateString('en-IN')}`, 'holiday')
+      setToast({ message: 'Holiday broadcasted successfully!', type: 'success' })
+      setTitle('')
+      setReason('')
+    } catch (err) {
+      console.error(err)
+      setToast({ message: 'Failed to broadcast holiday.', type: 'error' })
+    }
   }
 
   const isAdmin = user?.role?.toLowerCase() === 'admin'

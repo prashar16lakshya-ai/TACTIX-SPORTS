@@ -25,11 +25,7 @@ export default function AnnouncementsModule() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (user?.isDemo) {
-      setAchievements(data?.announcements || []);
-      setLoading(false);
-      return;
-    }
+    // Remove isDemo logic, rely solely on Firebase
 
     const q = query(collection(db, 'announcements'), orderBy('date', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -50,14 +46,7 @@ export default function AnnouncementsModule() {
     
     setSubmitting(true);
     try {
-      if (user?.isDemo) {
-        // Simulate network delay for realistic UX
-        await new Promise(resolve => setTimeout(resolve, 800));
-        alert('Demo Mode: Announcement posted successfully (simulated)!');
-        setShowModal(false);
-        setNewPost({ title: '', description: '', type: 'school' });
-        return;
-      }
+      // Real Firebase post logic follows
 
       await addDoc(collection(db, 'announcements'), {
         title: newPost.title,

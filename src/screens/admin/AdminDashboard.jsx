@@ -5,8 +5,7 @@ import { useAppData } from '../../context/AppDataContext'
 import DashboardLayout from '../../components/dashboard/DashboardLayout'
 import AnimatedNumber from '../../components/common/AnimatedNumber'
 
-// Mock dynamic data for production feel
-const ALERTS = []
+// Real dynamic data
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
@@ -46,11 +45,18 @@ export default function AdminDashboard() {
   }, [data?.alerts])
 
   const chartData = useMemo(() => {
-    if (trendRange === 'Week') return [65, 45, 78, 52, 90, 85, 95];
-    if (trendRange === 'Month') return [40, 60, 55, 80, 70, 85, 90];
-    if (trendRange === 'Season') return [30, 40, 50, 65, 75, 85, 95];
-    return [65, 45, 78, 52, 90, 85, 95];
-  }, [trendRange])
+    if (!data?.activityLogs || data.activityLogs.length === 0) return [0, 0, 0, 0, 0, 0, 0];
+    
+    const counts = [0, 0, 0, 0, 0, 0, 0];
+    data.activityLogs.forEach(log => {
+      const day = new Date().getDay();
+      const idx = day === 0 ? 6 : day - 1;
+      counts[idx] += 1;
+    });
+    
+    const max = Math.max(...counts, 1);
+    return counts.map(c => Math.round((c / max) * 100));
+  }, [data?.activityLogs, trendRange])
 
   // SECTION 6: Leaderboard Preview
   const topPlayers = useMemo(() => {

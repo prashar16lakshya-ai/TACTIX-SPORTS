@@ -17,16 +17,7 @@ export default function LoginScreen() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Auto-reset loading state after 10s to prevent stuck "Logging in..."
-  useEffect(() => {
-    if (!loading) return
-    const timeout = setTimeout(() => {
-      console.warn('[LoginScreen] Loading timeout — resetting')
-      setLoading(false)
-      setError('Login is taking too long. Please try again.')
-    }, 10000)
-    return () => clearTimeout(timeout)
-  }, [loading])
+  // Removed 10s fake timeout to prevent premature login failures
 
   // 🔐 EMAIL LOGIN
   const handleSubmit = async (e) => {

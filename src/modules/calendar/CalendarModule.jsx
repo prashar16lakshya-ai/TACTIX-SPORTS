@@ -1,7 +1,9 @@
-﻿import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import DashboardLayout from '../../components/dashboard/DashboardLayout'
 import { useAppData } from '../../context/AppDataContext'
 import { useAuth } from '../../context/AuthContext'
+import { collection, query, onSnapshot, addDoc, deleteDoc, doc, orderBy } from 'firebase/firestore'
+import { db } from '../../firebase'
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 const EVENT_TYPES = {
@@ -324,8 +326,17 @@ export default function CalendarModule() {
   const [selectedDate, setSelectedDate] = useState(null)
   const [showModal, setShowModal] = useState(false)
   const [modalDate, setModalDate] = useState(null)
+  
+  const [firebaseEvents, setFirebaseEvents] = useState([])
+  
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, 'calendarEvents'), (snapshot) => {
+      const evts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      setFirebaseEvents(evts)
+    })
+    return () => unsub()
+  }, [])
 
-  // ── Merge holidays + custom events ──
   const allEvents = useMemo(() => {
     const holidayEvents = (data.holidays || []).map(h => ({
       id: `h-${h.date}`,
@@ -336,9 +347,9 @@ export default function CalendarModule() {
       time: 'Full Day',
       team: 'All',
     }))
-    const customEvents = (data.calendarEvents || []).map(e => ({ ...e, endDate: e.endDate || e.date }))
+    const customEvents = firebaseEvents.map(e => ({ ...e, endDate: e.endDate || e.date }))
     return [...holidayEvents, ...customEvents].sort((a, b) => (a.date || '').localeCompare(b.date || ''))
-  }, [data.holidays, data.calendarEvents])
+  }, [data.holidays, firebaseEvents])
 
   // ── Calendar grid ──
   const calendarDays = useMemo(() => {
@@ -361,23 +372,36 @@ export default function CalendarModule() {
     setViewDate(d)
   }
 
-  const handleAddEvent = (eventData) => {
+  const handleAddEvent = async (eventData) => {
     if (eventData.type === 'holiday') {
-      setHoliday({ date: eventData.date, endDate: eventData.endDate, title: eventData.title, reason: eventData.description || eventData.title })
+      try {
+        await addDoc(collection(db, 'holidays'), { 
+          date: eventData.date, 
+          endDate: eventData.endDate, 
+          title: eventData.title, 
+          reason: eventData.description || eventData.title,
+          createdBy: user?.name || 'Admin',
+          createdAt: new Date().toISOString()
+        })
+      } catch (err) {
+        console.error(err)
+      }
     } else {
-      updateData(prev => ({
-        ...prev,
-        calendarEvents: [...(prev.calendarEvents || []), eventData],
-      }))
+      try {
+        await addDoc(collection(db, 'calendarEvents'), eventData)
+      } catch (err) {
+        console.error(err)
+      }
     }
     setSelectedDate(eventData.date)
   }
 
-  const handleDeleteEvent = (id) => {
-    updateData(prev => ({
-      ...prev,
-      calendarEvents: (prev.calendarEvents || []).filter(e => e.id !== id),
-    }))
+  const handleDeleteEvent = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'calendarEvents', id))
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   const selectedEvents = selectedDate

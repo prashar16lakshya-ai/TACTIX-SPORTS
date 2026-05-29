@@ -110,7 +110,7 @@ export default function DashboardSidebar({ onClose }) {
         </div>
         <div className="min-w-0">
           <p className="text-on-surface font-semibold text-sm truncate">{user?.name || 'User'}</p>
-          <p className="text-[#FF1493]/60 text-[11px] capitalize">{user?.role || 'Member'}{user?.isDemo ? ' · Demo' : ''}</p>
+          <p className="text-[#FF1493]/60 text-[11px] capitalize">{user?.role || 'Member'}</p>
         </div>
       </div>
 

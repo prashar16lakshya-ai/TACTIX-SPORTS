@@ -26,14 +26,7 @@ const createRealInitialData = () => ({
   announcements: [],
   alerts: [],
   remarks: [],
-  holidays: [
-    { date: '2026-01-26', reason: 'Republic Day Celebration',  title: 'Republic Day' },
-    { date: '2026-03-14', reason: 'Festival of Colors',        title: 'Holi' },
-    { date: '2026-08-15', reason: 'Independence Day Ceremony', title: 'Independence Day' },
-    { date: '2026-10-02', reason: 'Gandhi Jayanti',            title: 'Gandhi Jayanti' },
-    { date: '2026-11-01', reason: 'Festival of Lights',        title: 'Diwali' },
-    { date: '2026-12-25', reason: 'Christmas Break',           title: 'Christmas' },
-  ],
+  holidays: [],
   attendanceByDate: {},
 })
 
@@ -45,25 +38,6 @@ export function AppDataProvider({ children }) {
   // ─── Real-time Sync with Firestore ─────────────────────────────
   useEffect(() => {
     if (!user?.uid) return
-
-    // In demo mode, provide mock data instead of Firestore queries
-    if (user?.isDemo) {
-      setData(prev => ({
-        ...prev,
-        players: [
-          { id: 'demo-p1', name: 'Arjun Sharma', role: 'player', sport: 'Football', teamId: 'DEMO-TEAM', schoolId: 'DEMO-SCHOOL', initials: 'AS', attendanceStats: { total: 20, attended: 18, percentage: 90 } },
-          { id: 'demo-p2', name: 'Priya Singh', role: 'player', sport: 'Football', teamId: 'DEMO-TEAM', schoolId: 'DEMO-SCHOOL', initials: 'PS', attendanceStats: { total: 20, attended: 16, percentage: 80 } },
-          { id: 'demo-p3', name: 'Rahul Kumar', role: 'player', sport: 'Football', teamId: 'DEMO-TEAM', schoolId: 'DEMO-SCHOOL', initials: 'RK', attendanceStats: { total: 20, attended: 14, percentage: 70 } },
-          { id: 'demo-p4', name: 'Ananya Patel', role: 'player', sport: 'Football', teamId: 'DEMO-TEAM', schoolId: 'DEMO-SCHOOL', initials: 'AP', attendanceStats: { total: 20, attended: 19, percentage: 95 } },
-          { id: 'demo-p5', name: 'Vikram Rao', role: 'player', sport: 'Football', teamId: 'DEMO-TEAM', schoolId: 'DEMO-SCHOOL', initials: 'VR', attendanceStats: { total: 20, attended: 12, percentage: 60 } },
-        ],
-        groups: [
-          { id: 'DEMO-TEAM', name: 'Demo Team', sport: 'Football', schoolId: 'DEMO-SCHOOL', teamId: 'DEMO-TEAM' },
-        ],
-      }))
-      return // Don't set up Firestore listeners in demo mode
-    }
-
 
     // Setup Queries based on Role and School/Team for Isolation
     const role = user?.role?.toLowerCase()
@@ -95,9 +69,16 @@ export function AppDataProvider({ children }) {
       setData(prev => ({ ...prev, groups: groupList }))
     }, (err) => console.error('[AppDataContext] Sync Groups Error:', err))
 
+    // Sync Holidays
+    const unsubHolidays = onSnapshot(query(collection(db, 'holidays')), (snapshot) => {
+      const hList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      setData(prev => ({ ...prev, holidays: hList }))
+    }, (err) => console.error('[AppDataContext] Sync Holidays Error:', err))
+
     return () => {
       unsubPlayers()
       unsubGroups()
+      unsubHolidays()
     }
   }, [user?.uid])
 
@@ -134,17 +115,7 @@ export function AppDataProvider({ children }) {
     setData((prev) => ({ ...prev, activityLogs: prev.activityLogs.filter((l) => l.id !== logId) }))
   }, [])
 
-  const setHoliday = useCallback((holidayData) => {
-    setData((prev) => {
-      const exists = prev.holidays.findIndex(h => h.date === holidayData.date)
-      if (exists !== -1) {
-        const newHolidays = [...prev.holidays]
-        newHolidays[exists] = holidayData
-        return { ...prev, holidays: newHolidays }
-      }
-      return { ...prev, holidays: [...prev.holidays, holidayData] }
-    })
-  }, [])
+  // setHoliday removed, it is now managed via Firestore addDoc/deleteDoc where needed
 
   const setAttendanceForDate = useCallback((dateKey, attendanceRows) => {
     setData((prev) => {
@@ -183,9 +154,8 @@ export function AppDataProvider({ children }) {
     appendActivityLog,
     clearActivityLogs,
     deleteActivityLog,
-    setHoliday,
     setAttendanceForDate,
-  }), [data, updateData, saveProfile, appendActivityLog, clearActivityLogs, deleteActivityLog, setHoliday, setAttendanceForDate])
+  }), [data, updateData, saveProfile, appendActivityLog, clearActivityLogs, deleteActivityLog, setAttendanceForDate])
 
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>
 }

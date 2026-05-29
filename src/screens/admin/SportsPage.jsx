@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { collection, query, onSnapshot } from 'firebase/firestore'
+import { collection, query, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore'
 import { db } from '../../firebase'
 import TopBar from '../../components/TopBar'
 import BottomNav from '../../components/BottomNav'
+import EmptyState from '../../components/common/EmptyState'
 
 // Pre-defined icons for sports if they don't have one in DB
 const SPORT_ICONS = {
@@ -49,9 +50,14 @@ export default function SportsPage() {
     (s.name || '').toLowerCase().includes(search.toLowerCase())
   )
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if(window.confirm('Are you sure you want to delete this sport?')) {
-      console.log('Delete sport', id)
+      try {
+        await deleteDoc(doc(db, 'sports', id))
+      } catch (err) {
+        console.error('Error deleting sport:', err)
+        alert('Failed to delete sport.')
+      }
     }
   }
 
@@ -77,15 +83,19 @@ export default function SportsPage() {
     setIsModalOpen(true)
   }
 
-  const saveSport = () => {
+  const saveSport = async () => {
     if (!sportForm.name.trim()) return
-    // In a real app, update/add to DB here. For now, mock update state locally.
-    if (editingSport) {
-      setSportsList(prev => prev.map(s => s.id === editingSport.id ? { ...s, name: sportForm.name } : s))
-    } else {
-      setSportsList(prev => [...prev, { id: Date.now().toString(), name: sportForm.name, teamsCount: 0, playersCount: 0 }])
+    try {
+      if (editingSport) {
+        await updateDoc(doc(db, 'sports', editingSport.id), { name: sportForm.name })
+      } else {
+        await addDoc(collection(db, 'sports'), { name: sportForm.name, teamsCount: 0, playersCount: 0 })
+      }
+      setIsModalOpen(false)
+    } catch (err) {
+      console.error('Error saving sport:', err)
+      alert('Failed to save sport.')
     }
-    setIsModalOpen(false)
   }
 
   return (
@@ -150,10 +160,13 @@ export default function SportsPage() {
         </div>
 
         {filtered.length === 0 && (
-          <div className="text-center py-16 text-on-surface/40">
-            <span className="material-symbols-outlined text-[48px] opacity-50">search_off</span>
-            <p className="mt-4 text-sm font-lexend">No sports found.</p>
-          </div>
+          <EmptyState
+            icon="sports"
+            title="No sports found"
+            description="Start by adding a sport to your organization."
+            actionLabel="Add Sport"
+            onAction={openAddModal}
+          />
         )}
       </main>
 

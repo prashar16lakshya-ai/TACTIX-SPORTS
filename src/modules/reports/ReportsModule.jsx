@@ -25,14 +25,52 @@ export default function ReportsModule() {
   const [selectedTeam, setSelectedTeam] = useState('All Teams');
   const [selectedPlayer, setSelectedPlayer] = useState('All Players');
 
-  const generateMockData = (type) => {
-    // Real Data Logic
+  const generateReportData = (type) => {
     if (type === 'attendance') {
       return (data?.players || []).map(p => ({
         name: p.name || 'Unknown',
+        team: p.team || p.groupName || 'No Team',
         sessions: p.attendanceStats?.total || 0,
         attended: p.attendanceStats?.present || 0,
         percentage: `${p.attendanceStats?.percentage || 0}%`
+      }));
+    }
+    if (type === 'performance') {
+      return (data?.players || []).map(p => ({
+        name: p.name || 'Unknown',
+        team: p.team || p.groupName || 'No Team',
+        score: p.performanceScore || p.score || 0,
+        sport: p.sport || 'Unknown'
+      }));
+    }
+    if (type === 'match') {
+      return (data?.matches || []).map(m => ({
+        title: m.title || 'Match',
+        date: m.date || 'Unknown',
+        result: m.result || 'Pending',
+        score: m.score || '-'
+      }));
+    }
+    if (type === 'training') {
+      return (data?.trainings || []).map(t => ({
+        title: t.title || 'Training',
+        date: t.date || 'Unknown',
+        focus: t.focus || t.type || 'General'
+      }));
+    }
+    if (type === 'progress') {
+      return (data?.players || []).map(p => ({
+        name: p.name || 'Unknown',
+        team: p.team || p.groupName || 'No Team',
+        improvements: p.improvements || 'Steady',
+        status: p.status || 'Active'
+      }));
+    }
+    if (type === 'announcement') {
+      return (data?.announcements || []).map(a => ({
+        title: a.title || 'Announcement',
+        date: a.date || 'Unknown',
+        audience: a.audience || 'All'
       }));
     }
     return [];
@@ -138,8 +176,8 @@ export default function ReportsModule() {
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      const data = generateMockData(report.id);
-                      handleDownloadPdf(report.label, data);
+                      const dataList = generateReportData(report.id);
+                      handleDownloadPdf(report.label, dataList);
                     }}
                     className="bg-on-surface/5 hover:bg-[#FF1493]/20 text-[#FF1493] px-3 py-2 rounded-xl border border-outline-variant/30 transition-all active:scale-95 flex items-center justify-center gap-1"
                     title="Download PDF"
@@ -150,8 +188,8 @@ export default function ReportsModule() {
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      const data = generateMockData(report.id);
-                      handleDownloadExcel(report.label, data);
+                      const dataList = generateReportData(report.id);
+                      handleDownloadExcel(report.label, dataList);
                     }}
                     className="bg-on-surface/5 hover:bg-green-500/20 text-green-500 px-3 py-2 rounded-xl border border-outline-variant/30 transition-all active:scale-95 flex items-center justify-center gap-1"
                     title="Download Excel"
