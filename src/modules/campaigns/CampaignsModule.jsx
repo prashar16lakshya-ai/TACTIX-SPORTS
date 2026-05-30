@@ -8,6 +8,7 @@ import EmptyState from '../../components/common/EmptyState';
 export default function CampaignsModule() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('All Campaigns');
+  const [searchQuery, setSearchQuery] = useState('');
   const { data } = useAppData();
   const campaigns = data?.campaigns || [];
 
@@ -100,13 +101,13 @@ export default function CampaignsModule() {
         {/* Campaign List */}
         <div className="flex flex-col gap-4">
           {filteredCampaigns.map(campaign => (
-            <div key={campaign.id} className="bg-[#111111] border border-white/5 rounded-2xl p-4 flex gap-4 hover:bg-white/[0.02] transition-colors cursor-pointer group">
+            <div key={campaign.id} onClick={() => navigate(`/campaigns/${campaign.id}`)} className="bg-[#111111] border border-white/5 rounded-2xl p-4 flex gap-4 hover:bg-white/[0.02] transition-colors cursor-pointer group">
               
               {/* Image Placeholder */}
               <div className={`w-28 h-28 rounded-xl shrink-0 bg-gradient-to-br ${campaign.imageColor} flex flex-col items-center justify-center p-3 text-center relative overflow-hidden`}>
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
                 <span className="font-black text-on-surface leading-tight uppercase relative z-10 text-[11px] drop-shadow-md">
-                  {campaign.title.split(' ').map((word, i) => (
+                  {(campaign.title || 'Untitled').split(' ').map((word, i) => (
                     <React.Fragment key={i}>{word}<br/></React.Fragment>
                   ))}
                 </span>
@@ -116,8 +117,8 @@ export default function CampaignsModule() {
               <div className="flex-1 flex flex-col justify-between py-1 min-w-0">
                 <div className="flex justify-between items-start gap-2">
                   <div className="min-w-0">
-                    <h3 className="text-on-surface font-bold text-base truncate">{campaign.title}</h3>
-                    <p className="text-on-surface/50 text-[11px] mt-1 line-clamp-2 leading-relaxed">{campaign.description}</p>
+                    <h3 className="text-on-surface font-bold text-base truncate">{campaign.title || 'Untitled Campaign'}</h3>
+                    <p className="text-on-surface/50 text-[11px] mt-1 line-clamp-2 leading-relaxed">{campaign.description || 'No description provided.'}</p>
                   </div>
                   <span className={`px-2 py-1 rounded-md text-[10px] font-bold border shrink-0 ${campaign.statusColor}`}>
                     {campaign.status}
@@ -173,9 +174,7 @@ export default function CampaignsModule() {
             <EmptyState
               icon="campaign"
               title="No campaigns found"
-              description={campaigns.length === 0 ? "You haven't created any campaigns yet." : "No campaigns match your filters."}
-              actionLabel="Create Campaign"
-              onAction={() => alert('Add Campaign clicked')}
+              message={campaigns.length === 0 ? "You haven't created any campaigns yet." : "No campaigns match your filters."}
             />
           )}
         </div>

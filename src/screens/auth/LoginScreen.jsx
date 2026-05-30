@@ -7,7 +7,7 @@ import Logo from '../../components/common/Logo'
 
 export default function LoginScreen() {
   const navigate = useNavigate()
-  const { login, loginWithGoogle, loginAsDemo } = useAuth()
+  const { login, loginWithGoogle } = useAuth()
 
   const { isDark, toggleTheme } = useTheme()
 
@@ -219,30 +219,7 @@ export default function LoginScreen() {
           Continue with Google
         </button>
 
-        {/* Demo Mode */}
-        <div className="mt-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="flex-1 h-px bg-on-surface/10"></div>
-            <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Try Demo</span>
-            <div className="flex-1 h-px bg-on-surface/10"></div>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            {['admin', 'coach', 'athlete'].map((demoRole) => (
-              <button
-                key={demoRole}
-                type="button"
-                onClick={() => {
-                  loginAsDemo(demoRole)
-                  navigate('/dashboard', { replace: true })
-                }}
-                disabled={loading}
-                className="h-11 bg-on-surface/5 border border-outline-variant/20 text-on-surface font-bold rounded-xl flex items-center justify-center text-label-sm uppercase tracking-wider hover:bg-[#DC143C]/10 hover:border-[#DC143C]/30 hover:text-[#DC143C] transition-all active:scale-[0.96] disabled:opacity-50"
-              >
-                {demoRole}
-              </button>
-            ))}
-          </div>
-        </div>
+
 
         {/* Footer CTA */}
         <div className="text-center mt-6">

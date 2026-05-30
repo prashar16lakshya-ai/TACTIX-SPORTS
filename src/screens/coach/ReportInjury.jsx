@@ -18,7 +18,7 @@ export default function ReportInjury() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { user } = useAuth()
-  const { data, isDemoMode } = useAppData()
+  const { data } = useAppData()
 
   const preselectedId = searchParams.get('playerId') || ''
   const players = data?.players || []
@@ -58,9 +58,7 @@ export default function ReportInjury() {
         createdAt: serverTimestamp(),
       }
 
-      if (!isDemoMode) {
-        await addDoc(collection(db, 'injuries'), injuryData)
-      }
+      await addDoc(collection(db, 'injuries'), injuryData)
 
       setToast({ message: 'Injury reported successfully', type: 'success' })
       setTimeout(() => navigate(-1), 1200)
@@ -187,7 +185,7 @@ export default function ReportInjury() {
           {/* Submit */}
           <button
             type="submit"
-            disabled={saving || isDemoMode}
+            disabled={saving}
             className="w-full h-14 bg-red-500 text-white font-black uppercase tracking-widest text-sm rounded-xl hover:bg-red-600 active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 shadow-[0_0_20px_rgba(239,68,68,0.3)]"
           >
             {saving ? (
@@ -195,7 +193,7 @@ export default function ReportInjury() {
             ) : (
               <>
                 <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>local_hospital</span>
-                {isDemoMode ? 'Report Injury (Login Required)' : 'Report Injury'}
+                Report Injury
               </>
             )}
           </button>

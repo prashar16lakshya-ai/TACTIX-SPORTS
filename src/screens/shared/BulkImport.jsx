@@ -15,16 +15,11 @@ const FIELDS = [
   { key: 'teamName', label: 'Team Name', required: true },
 ]
 
-const DEMO_CSV_CONTENT = `name,position,teamName
-Aarav Mehta,Batsman,Cheetah XI
-Priya Sharma,Bowler,Cheetah XI
-Rohan Verma,All Rounder,Cheetah XI`;
-
 const STEPS = ['Upload File', 'Map Columns', 'Assign & Import']
 
 export default function BulkImport() {
   const navigate = useNavigate()
-  const { user, isDemoMode } = useAuth()
+  const { user } = useAuth()
   const { data, updateData, appendActivityLog } = useAppData()
   const fileRef = useRef()
 
@@ -109,11 +104,6 @@ export default function BulkImport() {
     }
   }
 
-  const loadDemo = () => {
-    setFile({ name: 'india_demo_players.csv' })
-    parseCSV(DEMO_CSV_CONTENT)
-  }
-
   // ── Step 2 helpers ────────────────────────────────────────
   const validateMapping = () => {
     for (const f of FIELDS) {
@@ -181,13 +171,11 @@ export default function BulkImport() {
     }
 
     try {
-      if (!isDemoMode) {
-        // Real user → Firestore persistence
-        const promises = playersToImport.map(player => 
-          addDoc(collection(db, 'users'), player)
-        )
-        await Promise.all(promises)
-      }
+      // Real user → Firestore persistence
+      const promises = playersToImport.map(player => 
+        addDoc(collection(db, 'users'), player)
+      )
+      await Promise.all(promises)
       
       // Always update local state for immediate feedback
       updateData((prev) => ({ 
@@ -305,9 +293,6 @@ export default function BulkImport() {
                   </span>
                   <input ref={fileRef} type="file" accept=".csv,.xlsx" className="hidden" onChange={e => handleFile(e.target.files[0])} />
                 </label>
-                <button onClick={loadDemo} className="w-full py-3 border border-outline-variant/30 text-on-surface/40 font-black rounded-xl text-[10px] uppercase tracking-widest hover:bg-on-surface/5 transition-all">
-                  ⚡ Load Demo Format
-                </button>
               </div>
             </div>
 
@@ -315,18 +300,6 @@ export default function BulkImport() {
             <div className="bg-on-surface/5 rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col">
               <div className="px-6 py-5 border-b border-outline-variant/30 flex items-center justify-between">
                 <h4 className="font-black text-xs text-on-surface uppercase tracking-widest">Required Format</h4>
-                <button
-                  onClick={() => {
-                    const blob = new Blob([DEMO_CSV_CONTENT], { type: 'text/csv' })
-                    const a = document.createElement('a')
-                    a.href = URL.createObjectURL(blob)
-                    a.download = 'tactix_template.csv'
-                    a.click()
-                  }}
-                  className="text-[10px] text-[#FF1493] font-black uppercase tracking-widest hover:underline flex items-center gap-1"
-                >
-                  <span className="material-symbols-outlined text-sm">download</span> Template
-                </button>
               </div>
               <div className="overflow-x-auto flex-1">
                 <table className="w-full text-[10px]">
@@ -498,12 +471,11 @@ export default function BulkImport() {
               <button onClick={() => setStep(1)} className="px-5 py-2.5 border border-outline-variant text-on-surface font-bold rounded-xl text-sm hover:bg-surface-variant transition-all">Back</button>
               <button
                 onClick={handleImport}
-                disabled={!assignGroup || isDemoMode}
-                title={isDemoMode ? "Login required to import players" : ""}
+                disabled={!assignGroup}
                 className="px-7 py-2.5 bg-[#0cca75] text-black font-black rounded-xl text-sm hover:brightness-110 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 <span className="material-symbols-outlined text-base">upload</span>
-                {isDemoMode ? 'Import (Demo Only)' : `Import ${rows.length} Players`}
+                {`Import ${rows.length} Players`}
               </button>
             </div>
           </div>

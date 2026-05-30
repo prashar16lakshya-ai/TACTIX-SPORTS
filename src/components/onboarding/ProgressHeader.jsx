@@ -1,7 +1,8 @@
 import React from 'react'
 
-export default function ProgressHeader({ step, title, subtitle, totalSteps = 2 }) {
-  const progressPercent = (step / totalSteps) * 100
+export default function ProgressHeader({ step, title, subtitle, totalSteps = 3 }) {
+  const currentStep = Math.min(step, totalSteps)
+  const progressPercent = (currentStep / totalSteps) * 100
 
   return (
     <div className="w-full mb-12 space-y-4">
@@ -19,7 +20,7 @@ export default function ProgressHeader({ step, title, subtitle, totalSteps = 2 }
         </div>
         <div className="text-right">
           <span className="font-lexend text-label-caps text-on-surface-variant block mb-1 uppercase tracking-widest text-xs font-bold">
-            Step {step} of {totalSteps}
+            Step {currentStep} of {totalSteps}
           </span>
         </div>
       </div>

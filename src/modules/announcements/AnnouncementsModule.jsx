@@ -38,7 +38,7 @@ export default function AnnouncementsModule() {
     });
 
     return () => unsubscribe();
-  }, [user?.isDemo, data?.announcements]);
+  }, [data?.announcements]);
 
   const handlePostSubmit = async (e) => {
     e.preventDefault();

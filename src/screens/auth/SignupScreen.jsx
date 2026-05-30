@@ -126,9 +126,6 @@ export default function SignupScreen() {
         )}
       </main>
 
-      {/* Ambient Glows */}
-      <div className="fixed top-1/4 -right-20 w-[40vw] h-[40vw] rounded-full bg-primary/5 blur-[120px] pointer-events-none z-0"></div>
-      <div className="fixed bottom-0 -left-20 w-[50vw] h-[50vw] rounded-full bg-accent-cyan/5 blur-[100px] pointer-events-none z-0"></div>
     </div>
   );
 }

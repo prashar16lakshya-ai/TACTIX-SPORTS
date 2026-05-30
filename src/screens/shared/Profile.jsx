@@ -78,10 +78,10 @@ export default function Profile() {
     : 'Head Coach'
 
   const stats = [
-    { label: 'Teams Managed', value: data.groups?.length || '2', icon: 'groups', color: 'text-red-400', bg: 'bg-red-400/10' },
-    { label: 'Players', value: data.players?.length || '24', icon: 'person', color: 'text-blue-400', bg: 'bg-blue-400/10' },
-    { label: 'Matches', value: '18', icon: 'calendar_today', color: 'text-green-400', bg: 'bg-green-400/10' },
-    { label: 'Win Rate', value: data.coach?.stats?.winRate ? `${data.coach.stats.winRate}%` : '72%', icon: 'emoji_events', color: 'text-orange-400', bg: 'bg-orange-400/10' },
+    { label: 'Teams Managed', value: data.groups?.length || 0, icon: 'groups', color: 'text-red-400', bg: 'bg-red-400/10' },
+    { label: 'Players', value: data.players?.length || 0, icon: 'person', color: 'text-blue-400', bg: 'bg-blue-400/10' },
+    { label: 'Matches', value: data.activityLogs?.filter(a => a?.message?.toLowerCase().includes('match')).length || 0, icon: 'calendar_today', color: 'text-green-400', bg: 'bg-green-400/10' },
+    { label: 'Win Rate', value: data.coach?.stats?.winRate ? `${data.coach.stats.winRate}%` : '0%', icon: 'emoji_events', color: 'text-orange-400', bg: 'bg-orange-400/10' },
   ]
 
   const editableFields = [
@@ -95,10 +95,6 @@ export default function Profile() {
   ]
 
   const handleFieldSave = async (field, value) => {
-    if (user?.isDemo) {
-      appendActivityLog(`(Demo) Updated profile field: ${field}`, 'info')
-      return
-    }
     try {
       if (user?.uid) {
         const { doc, updateDoc } = await import('firebase/firestore')
@@ -114,20 +110,17 @@ export default function Profile() {
     }
   }
 
-  const handlePasswordUpdate = () => {
-    if (!passwords.current) return setPwdMsg({ type: 'error', text: 'Enter your current password.' })
-    if (passwords.new.length < 6) return setPwdMsg({ type: 'error', text: 'New password must be at least 6 characters.' })
-    if (passwords.new !== passwords.confirm) return setPwdMsg({ type: 'error', text: 'Passwords do not match.' })
-    
-    if (user?.isDemo) {
-      setPwdMsg({ type: 'success', text: 'Password update simulated in Demo Mode!' })
-      setPasswords({ current: '', new: '', confirm: '' })
-      setTimeout(() => setPwdMsg(null), 3000)
-      return
+  const handlePasswordUpdate = async () => {
+
+    try {
+      const { sendPasswordResetEmail } = await import('firebase/auth')
+      const { auth } = await import('../../firebase')
+      await sendPasswordResetEmail(auth, user.email)
+      setPwdMsg({ type: 'success', text: 'Password reset email sent successfully.' })
+    } catch (err) {
+      console.error('Password reset error', err)
+      setPwdMsg({ type: 'error', text: 'Failed to send reset email. Please try again.' })
     }
-    
-    setPwdMsg({ type: 'success', text: 'Password updated successfully!' })
-    setPasswords({ current: '', new: '', confirm: '' })
     setTimeout(() => setPwdMsg(null), 3000)
   }
 
@@ -224,11 +217,11 @@ export default function Profile() {
                 </div>
                 <div>
                   <p className="text-on-surface/40 text-[10px] uppercase tracking-widest mb-1">Team</p>
-                  <p className="text-on-surface text-sm font-semibold">{data.coach?.teamName || data.groups?.[0]?.name || 'Thunder FC'}</p>
+                  <p className="text-on-surface text-sm font-semibold">{data.coach?.teamName || data.groups?.[0]?.name || '—'}</p>
                 </div>
                 <div>
                   <p className="text-on-surface/40 text-[10px] uppercase tracking-widest mb-1">Member Since</p>
-                  <p className="text-on-surface text-sm font-semibold">Jan 15, 2024</p>
+                  <p className="text-on-surface text-sm font-semibold">{user?.metadata?.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'}</p>
                 </div>
               </div>
             </div>
@@ -345,53 +338,34 @@ export default function Profile() {
 
           {/* Right Column */}
           <div className="flex flex-col gap-8">
-            {/* Change Password */}
-            <div className="bg-on-surface/5 border border-white/5 rounded-2xl p-6">
-              <div className="flex items-center gap-2 mb-6">
-                <span className="material-symbols-outlined text-[#FF1493]">lock</span>
-                <h3 className="text-lg font-bold text-on-surface">Change Password</h3>
-              </div>
-              <div className="flex flex-col gap-4">
-                {[
-                  { key: 'current', label: 'Current Password', placeholder: 'Enter current password' },
-                  { key: 'new', label: 'New Password', placeholder: 'Enter new password' },
-                  { key: 'confirm', label: 'Confirm New Password', placeholder: 'Confirm new password' },
-                ].map(({ key, label, placeholder }) => (
-                  <div key={key}>
-                    <label className="text-on-surface/60 text-xs font-medium mb-1.5 block">{label}</label>
-                    <div className="relative">
-                      <input
-                        type={showPwd[key] ? 'text' : 'password'}
-                        placeholder={placeholder}
-                        value={passwords[key]}
-                        onChange={e => setPasswords(p => ({ ...p, [key]: e.target.value }))}
-                        className="w-full bg-on-surface/5 border border-outline-variant/30 rounded-xl px-4 py-3 pr-12 text-on-surface text-sm placeholder:text-on-surface/20 focus:outline-none focus:border-[#FF1493]/50 transition-colors"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPwd(p => ({ ...p, [key]: !p[key] }))}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface/20 hover:text-on-surface/60 transition-colors"
-                      >
-                        <span className="material-symbols-outlined text-[20px]">{showPwd[key] ? 'visibility' : 'visibility_off'}</span>
-                      </button>
+            {/* Password & Security */}
+            {(!user?.providerData || user.providerData.some(p => p.providerId === 'password')) && (
+              <div className="bg-on-surface/5 border border-white/5 rounded-2xl p-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <span className="material-symbols-outlined text-[#FF1493]">lock</span>
+                  <h3 className="text-lg font-bold text-on-surface">Password & Security</h3>
+                </div>
+                <div className="flex flex-col gap-4">
+                  <p className="text-on-surface/60 text-sm">
+                    Receive a secure password reset link on your registered email.
+                  </p>
+                  
+                  {pwdMsg && (
+                    <div className={`text-sm px-4 py-3 rounded-xl font-medium ${pwdMsg.type === 'success' ? 'bg-green-500/10 border border-green-500/20 text-green-400' : 'bg-red-500/10 border border-red-500/20 text-red-400'}`}>
+                      {pwdMsg.text}
                     </div>
-                  </div>
-                ))}
+                  )}
 
-                {pwdMsg && (
-                  <div className={`text-sm px-4 py-3 rounded-xl font-medium ${pwdMsg.type === 'success' ? 'bg-green-500/10 border border-green-500/20 text-green-400' : 'bg-red-500/10 border border-red-500/20 text-red-400'}`}>
-                    {pwdMsg.text}
-                  </div>
-                )}
-
-                <button
-                  onClick={handlePasswordUpdate}
-                  className="w-full bg-[#FF1493] hover:bg-[#C01277] active:scale-[0.98] text-on-surface py-3 rounded-xl font-bold transition-all mt-2 shadow-[0_0_20px_rgba(168,85,247,0.3)]"
-                >
-                  Update Password
-                </button>
+                  <button
+                    onClick={handlePasswordUpdate}
+                    className="w-full bg-[#FF1493] hover:bg-[#C01277] active:scale-[0.98] text-on-surface py-3 rounded-xl font-bold transition-all mt-2 shadow-[0_0_20px_rgba(168,85,247,0.3)] flex items-center justify-center gap-2"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">send</span>
+                    Send Reset Link
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Recent Activity */}
             <div className="bg-on-surface/5 border border-white/5 rounded-2xl p-6 flex-1">

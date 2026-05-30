@@ -192,14 +192,13 @@ export default function MarkAttendance() {
           <button
             id="save-attendance"
             onClick={handleSave}
-            disabled={saving || isHoliday || user?.isDemo}
-            title={user?.isDemo ? "Login required to save attendance" : ""}
+            disabled={saving || isHoliday}
             className="w-full h-14 bg-primary-container text-secondary font-inter font-bold text-xl px-8 rounded-xl shadow-[0_4px_24px_rgba(12,202,117,0.4)] hover:bg-inverse-primary transition-colors flex items-center justify-center gap-3 disabled:opacity-60"
           >
             {saving ? (
               <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z" /></svg>
             ) : (
-              <><span className="material-symbols-outlined text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>cloud_upload</span>{user?.isDemo ? 'Save Attendance (Login Required)' : 'Save Attendance'}</>
+              <><span className="material-symbols-outlined text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>cloud_upload</span>Save Attendance</>
             )}
           </button>
         </div>

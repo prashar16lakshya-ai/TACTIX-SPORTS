@@ -4,7 +4,8 @@ import InputField from '../../components/onboarding/InputField';
 import Button from '../../components/onboarding/Button';
 import { generateCode, createAccessCode, validateCode } from '../../utils/codeManager';
 import { db } from '../../firebase';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp, collection, query, where, getDocs } from 'firebase/firestore';
+import { auth } from '../../firebase';
 
 export default function OnboardingStep3({ data, onDataChange, completeSignup }) {
   const [loading, setLoading] = useState(false);
@@ -49,41 +50,72 @@ export default function OnboardingStep3({ data, onDataChange, completeSignup }) 
 
   const handleAdminSetup = async (e) => {
     e.preventDefault();
-    if (!stepData.schoolName) {
-      setError('Please fill in all fields');
+    if (!stepData.schoolName || stepData.schoolName.trim().length < 3) {
+      setError('School name must be at least 3 characters');
       return;
     }
     setLoading(true);
     setError('');
     try {
+      if (!auth.currentUser) {
+        throw { code: 'unauthenticated', message: 'User not authenticated' };
+      }
+
+      // Check for duplicate school name
+      const schoolsRef = collection(db, 'schools');
+      const q = query(schoolsRef, where('name', '==', stepData.schoolName.trim()));
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        throw { code: 'already-exists', message: 'A school with this name already exists.' };
+      }
+
       const sportCode = generateCode('SPT', 'ALL');
       const schoolId = `SCH-${Date.now()}`;
 
       await setDoc(doc(db, 'schools', schoolId), {
         schoolId,
-        name: stepData.schoolName,
+        name: stepData.schoolName.trim(),
         createdAt: serverTimestamp(),
+        createdBy: auth.currentUser.uid,
+        adminEmail: auth.currentUser.email
       });
 
       await createAccessCode({
         code: sportCode,
         type: 'sport',
-        createdBy: data.email,
+        createdBy: auth.currentUser.email || data.email,
         schoolId: schoolId,
-        schoolName: stepData.schoolName,
+        schoolName: stepData.schoolName.trim(),
       });
 
       setGeneratedCode(sportCode);
       onDataChange({
         schoolId,
-        schoolName: stepData.schoolName,
+        schoolName: stepData.schoolName.trim(),
         sport: 'ALL',
         generatedSportCode: sportCode
       });
       setStep(2); // Show generated code
       setSuccess('School created successfully!');
     } catch (err) {
-      setError('Failed to set up school. Please try again.');
+      console.error("School creation failed:", err);
+      switch(err.code) {
+        case "permission-denied":
+          setError("You don't have permission to create a school.");
+          break;
+        case "unavailable":
+          setError("Server unavailable. Check your connection and try again.");
+          break;
+        case "already-exists":
+          setError(err.message);
+          break;
+        case "unauthenticated":
+          setError("Your session expired. Please log in again.");
+          break;
+        default:
+          setError(err.message || "Failed to set up school. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -243,14 +275,14 @@ export default function OnboardingStep3({ data, onDataChange, completeSignup }) 
   );
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-6">
+    <div className="w-full max-w-md mx-auto space-y-6 box-border max-w-full overflow-x-hidden">
       <ProgressHeader
         step={3}
         title={data.role === 'admin' ? 'School Setup' : data.role === 'coach' ? 'Team Setup' : 'Join YOUR TEAM NAME'}
         subtitle="Finish setting up your details."
       />
 
-      <div className="w-full bg-surface-container-low border border-outline-variant p-6 md:p-8 rounded-xl shadow-2xl glass relative overflow-hidden">
+      <div className="w-full bg-surface-container-low border border-outline-variant p-6 md:p-8 rounded-xl shadow-2xl glass relative overflow-hidden box-border max-w-full">
         {error && (
           <div className="mb-6 flex items-center gap-2 p-3 bg-error-container/20 border border-error/30 rounded-lg animate-in slide-in-from-top-2">
             <span className="material-symbols-outlined text-error text-[18px]">error</span>

@@ -14,12 +14,7 @@ export default function AdminDashboard() {
   const [trendRange, setTrendRange] = useState('Week')
 
   // SECTION 1: System Snapshot Stats
-  const systemStats = [
-    { label: 'Total Teams', icon: 'groups', value: data?.groups?.length || 0, trend: data?.groups?.length > 0 ? '+1' : '0', color: 'text-[#FF1493]' },
-    { label: 'Total Players', icon: 'directions_run', value: data?.players?.length || 0, trend: data?.players?.length > 0 ? '+1' : '0', color: 'text-[#DC143C]' },
-    { label: 'Active Coaches', icon: 'sports', value: data?.groups?.length > 0 ? Math.ceil(data.groups.length / 2) : 0, trend: '0%', color: 'text-green-500' },
-    { label: 'Activity Score', icon: 'bolt', value: data?.players?.length > 0 ? '92' : '0', trend: '0%', color: 'text-yellow-500' },
-  ]
+
 
 
 
@@ -415,23 +410,23 @@ export default function AdminDashboard() {
                   <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-[#FF1493] transition-all duration-1000" strokeDasharray="440" strokeDashoffset={440 - (440 * (1.0))} strokeLinecap="round" />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-4xl font-black text-on-surface tracking-tighter">100%</span>
-                  <span className="text-[10px] text-[#FF1493] font-black uppercase tracking-widest">Healthy</span>
+                  <span className="text-4xl font-black text-on-surface tracking-tighter">{alertCount === 0 ? '100%' : '90%'}</span>
+                  <span className="text-[10px] text-[#FF1493] font-black uppercase tracking-widest">{alertCount === 0 ? 'Healthy' : 'Needs Check'}</span>
                 </div>
               </div>
               <p className="text-on-surface/60 text-xs text-center max-w-[200px] leading-relaxed">
-                All systems operational. No critical issues detected.
+                {alertCount === 0 ? 'All systems operational. No critical issues detected.' : `${alertCount} system alerts require attention.`}
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4 border-t border-white/5 pt-6">
               <div className="flex flex-col">
                 <span className="text-[10px] text-on-surface/30 uppercase font-black tracking-widest">Attendance</span>
-                <span className="text-on-surface font-black text-lg">100%</span>
+                <span className="text-on-surface font-black text-lg">{avgAttendance}%</span>
               </div>
               <div className="flex flex-col text-right">
-                <span className="text-[10px] text-on-surface/30 uppercase font-black tracking-widest">Verification</span>
-                <span className="text-[#DC143C] font-black text-lg">Instant</span>
+                <span className="text-[10px] text-on-surface/30 uppercase font-black tracking-widest">Alerts</span>
+                <span className="text-[#DC143C] font-black text-lg">{alertCount}</span>
               </div>
             </div>
           </div>
